@@ -2,10 +2,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useReducer } from "react";
+import { Plus } from "lucide-react";
+import { useEffect, useReducer, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { DeserializedTheme, ThemeDialog } from "@/components/theme-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -25,6 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 const FormSchema = z.object({
   videoUrl: z
@@ -38,7 +42,13 @@ const FormSchema = z.object({
   noPublishedAt: z.boolean(),
   progress: z.number().min(0).max(100),
   size: z.number().min(1).max(6),
+  theme: z.array(z.string()).length(5),
 });
+
+const themes = [
+  ["#ffffff", "#606060", "#0f0f0f", "#2a2a2a", "#ff0000"],
+  ["#0f0f0f", "#aaaaaa", "#ffffff", "#2a2a2a", "#ff0000"],
+];
 
 const defaultValues: z.infer<typeof FormSchema> = {
   videoUrl: "https://www.youtube.com/watch?v=XEO3duW1A80",
@@ -47,19 +57,25 @@ const defaultValues: z.infer<typeof FormSchema> = {
   noPublishedAt: false,
   progress: 100,
   size: 3,
+  theme: themes[0],
 };
 
-function createApiUrl(values: z.infer<typeof FormSchema>) {
+function createApiUrl(
+  values: z.infer<typeof FormSchema>,
+  cacheBuster?: number
+) {
   return `/api/thumbnail?${new URLSearchParams(
-    Object.entries({ ...values, cacheBuster: Date.now() }).reduce<
-      Record<string, string>
-    >((acc, [key, value]) => {
+    Object.entries(
+      typeof cacheBuster === "number" ? { ...values, cacheBuster } : values
+    ).reduce<Record<string, string>>((acc, [key, value]) => {
       if (typeof value === "boolean") {
         if (value) {
           acc[key] = "true";
         }
       } else if (typeof value === "number") {
         acc[key] = String(value);
+      } else if (Array.isArray(value)) {
+        acc[key] = value.join(",");
       } else {
         acc[key] = value;
       }
@@ -92,7 +108,7 @@ export default function Home() {
     switch (action.type) {
       case "load":
         return {
-          href: createApiUrl(action.parameters),
+          href: createApiUrl(action.parameters, Date.now()),
           loading: true,
         };
       case "loaded":
@@ -104,10 +120,29 @@ export default function Home() {
         return prevState;
     }
   }, initialState);
+  const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
+  const [customThemes, setCustomThemes] = useState<DeserializedTheme[]>([]);
 
   function onSubmit(parameters: z.infer<typeof FormSchema>) {
     dispatch({ type: "load", parameters });
   }
+
+  function onCreateTheme(deserializedTheme: DeserializedTheme) {
+    const updatedCustomThemes = customThemes.concat(deserializedTheme);
+
+    localStorage.setItem("customThemes", JSON.stringify(updatedCustomThemes));
+    setCustomThemes(updatedCustomThemes);
+    setIsThemeDialogOpen(false);
+  }
+
+  useEffect(() => {
+    try {
+      const customThemes = JSON.parse(
+        localStorage.getItem("customThemes") ?? "[]"
+      );
+      setCustomThemes(customThemes);
+    } catch (err) {}
+  }, []);
 
   return (
     <main className="max-w-[900px] py-6 px-4 m-auto flex flex-col-reverse md:flex-row gap-8">
@@ -134,6 +169,59 @@ export default function Home() {
                           placeholder="https://www.youtube.com/watch?v=XEO3duW1A80"
                           {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="theme"
+                  render={({ field: { value, onChange } }) => (
+                    <FormItem>
+                      <FormLabel>Thème</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-5 gap-2">
+                          {themes
+                            .concat(
+                              customThemes.map((customTheme) => [
+                                customTheme.cardBackground,
+                                customTheme.textForegroundMuted,
+                                customTheme.textForeground,
+                                customTheme.durationBackground,
+                                customTheme.progressForeground,
+                              ])
+                            )
+                            .map((theme, themeIndex) => (
+                              <ul
+                                key={themeIndex}
+                                className={cn(
+                                  "cursor-pointer flex h-7 border border-input rounded-sm overflow-hidden opacity-60 hover:opacity-100",
+                                  theme.join(",") === value.join(",") &&
+                                    "border-primary opacity-100"
+                                )}
+                                onClick={() => onChange(theme)}
+                              >
+                                {theme.map((color, colorIndex) => (
+                                  <li
+                                    key={colorIndex}
+                                    className="w-3"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                ))}
+                              </ul>
+                            ))}
+
+                          <Dialog
+                            onOpenChange={setIsThemeDialogOpen}
+                            open={isThemeDialogOpen}
+                          >
+                            <DialogTrigger className="cursor-pointer flex items-center justify-center h-7 border border-input rounded-sm overflow-hidden px-2">
+                              <Plus size={16} />
+                            </DialogTrigger>
+                            <ThemeDialog onSubmit={onCreateTheme} />
+                          </Dialog>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

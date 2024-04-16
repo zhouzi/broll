@@ -125,13 +125,21 @@ export async function GET(request: NextRequest) {
     ? "100%"
     : `${Math.max(0, Math.min(100, parameterProgress))}%`;
 
+  const [
+    cardBackground = "#ffffff",
+    textForegroundMuted = "#606060",
+    textForeground = "#0f0f0f",
+    durationBackground = "#2a2a2a",
+    progressForeground = "#ff0000",
+  ] = parameters.theme?.split(",") ?? [];
+
   return new ImageResponse(
     (
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "white",
+          backgroundColor: cardBackground,
           padding: px(30),
           borderRadius: px(40),
         }}
@@ -152,9 +160,9 @@ export async function GET(request: NextRequest) {
                 position: "absolute",
                 bottom: px(4),
                 right: px(4),
-                backgroundColor: "#2a2a2a",
+                backgroundColor: durationBackground,
                 borderRadius: px(6),
-                color: "white",
+                color: "#ffffff",
                 fontSize: px(12),
                 fontWeight: 500,
                 padding: px(4),
@@ -174,12 +182,14 @@ export async function GET(request: NextRequest) {
               backgroundColor: "rgba(200, 200, 200, 0.6)",
             }}
           >
-            <div style={{ width: progress, backgroundColor: "#ff0000" }} />
+            <div
+              style={{ width: progress, backgroundColor: progressForeground }}
+            />
           </div>
         </div>
         <div
           style={{
-            color: "#0f0f0f",
+            color: textForeground,
             fontWeight: 500,
             fontSize: px(16),
             marginBottom: px(12),
@@ -193,7 +203,7 @@ export async function GET(request: NextRequest) {
               display: "flex",
               gap: px(4),
               fontSize: px(14),
-              color: "#606060",
+              color: textForegroundMuted,
             }}
           >
             {!parameters.noViews && <span>{videoDetails.views} vues</span>}
