@@ -1,8 +1,8 @@
-/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @next/next/no-img-element, react/no-unescaped-entities */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useReducer } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -27,49 +27,84 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 
 const FormSchema = z.object({
-  videoUrl: z.string().url(),
+  videoUrl: z
+    .string()
+    .url()
+    .refine((value) => new URL(value).searchParams.has("v"), {
+      message: "Le format de l'URL est invalide",
+    }),
   noDuration: z.boolean(),
   noViews: z.boolean(),
   noPublishedAt: z.boolean(),
   progress: z.number().min(0).max(100),
 });
 
+const defaultValues: z.infer<typeof FormSchema> = {
+  videoUrl: "https://www.youtube.com/watch?v=XEO3duW1A80",
+  noViews: false,
+  noDuration: false,
+  noPublishedAt: false,
+  progress: 100,
+};
+
+function createApiUrl(values: z.infer<typeof FormSchema>) {
+  return `/api/thumbnail?${new URLSearchParams(
+    Object.entries({ ...values, cacheBuster: Date.now() }).reduce<
+      Record<string, string>
+    >((acc, [key, value]) => {
+      if (typeof value === "boolean") {
+        if (value) {
+          acc[key] = "true";
+        }
+      } else if (typeof value === "number") {
+        acc[key] = String(value);
+      } else {
+        acc[key] = value;
+      }
+
+      return acc;
+    }, {})
+  ).toString()}`;
+}
+
+type Action =
+  | { type: "load"; parameters: z.infer<typeof FormSchema> }
+  | { type: "loaded" };
+
+interface State {
+  href: string;
+  loading: boolean;
+}
+
+const initialState: State = {
+  href: createApiUrl(defaultValues),
+  loading: false,
+};
+
 export default function Home() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      videoUrl: "https://www.youtube.com/watch?v=XEO3duW1A80",
-      noViews: false,
-      noDuration: false,
-      noPublishedAt: false,
-      progress: 100,
-    },
+    defaultValues,
   });
-  const [thumbnailUrl, setThumbnailUrl] = useState("/api/thumbnail");
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, dispatch] = useReducer((prevState: State, action: Action) => {
+    switch (action.type) {
+      case "load":
+        return {
+          href: createApiUrl(action.parameters),
+          loading: true,
+        };
+      case "loaded":
+        return {
+          ...prevState,
+          loading: false,
+        };
+      default:
+        return prevState;
+    }
+  }, initialState);
 
-  function onSubmit(values: z.infer<typeof FormSchema>) {
-    setIsLoading(true);
-    setThumbnailUrl(
-      `/api/thumbnail?${new URLSearchParams(
-        Object.entries(values).reduce<Record<string, string>>(
-          (acc, [key, value]) => {
-            if (typeof value === "boolean") {
-              if (value) {
-                acc[key] = "true";
-              }
-            } else if (typeof value === "number") {
-              acc[key] = String(value);
-            } else {
-              acc[key] = value;
-            }
-
-            return acc;
-          },
-          {}
-        )
-      ).toString()}`
-    );
+  function onSubmit(parameters: z.infer<typeof FormSchema>) {
+    dispatch({ type: "load", parameters });
   }
 
   return (
@@ -172,8 +207,8 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Génération..." : "Générer"}
+                <Button type="submit" disabled={state.loading}>
+                  {state.loading ? "Génération..." : "Générer"}
                 </Button>
               </form>
             </Form>
@@ -217,10 +252,10 @@ export default function Home() {
       >
         <img
           className="object-contain"
-          src={thumbnailUrl}
+          src={state.href}
           alt=""
           width="450"
-          onLoad={() => setIsLoading(false)}
+          onLoad={() => dispatch({ type: "loaded" })}
         />
       </div>
     </main>
