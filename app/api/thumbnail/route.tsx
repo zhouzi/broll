@@ -92,9 +92,9 @@ export async function GET(request: NextRequest) {
   const videoDetails = await fetchVideoDetails(videoId);
 
   const parameterProgress = Number(parameters.progress);
-  const progress = isNaN(Number(parameters.progress))
+  const progress = isNaN(parameterProgress)
     ? "100%"
-    : `${Math.max(0, Math.min(100, Number(parameters.progress)))}%`;
+    : `${Math.max(0, Math.min(100, parameterProgress))}%`;
 
   return new ImageResponse(
     (
