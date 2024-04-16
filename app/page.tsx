@@ -37,6 +37,7 @@ const FormSchema = z.object({
   noViews: z.boolean(),
   noPublishedAt: z.boolean(),
   progress: z.number().min(0).max(100),
+  size: z.number().min(1).max(6),
 });
 
 const defaultValues: z.infer<typeof FormSchema> = {
@@ -45,6 +46,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
   noDuration: false,
   noPublishedAt: false,
   progress: 100,
+  size: 3,
 };
 
 function createApiUrl(values: z.infer<typeof FormSchema>) {
@@ -139,10 +141,29 @@ export default function Home() {
                 />
                 <FormField
                   control={form.control}
+                  name="size"
+                  render={({ field: { value, onChange } }) => (
+                    <FormItem>
+                      <FormLabel>Taille x{value}</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={1}
+                          max={6}
+                          step={1}
+                          defaultValue={[value]}
+                          onValueChange={([newValue]) => onChange(newValue)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="progress"
                   render={({ field: { value, onChange } }) => (
                     <FormItem>
-                      <FormLabel>Progression de la lecture</FormLabel>
+                      <FormLabel>Progression de la lecture {value}%</FormLabel>
                       <FormControl>
                         <Slider
                           min={0}

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -67,6 +68,29 @@ async function fetchVideoDetails(videoId: string) {
   };
 }
 
+function createFactor(factor: number) {
+  // eslint no-unused-vars is complaining about the function overload
+  /* eslint-disable no-unused-vars */
+  function n(value: number): number;
+  function n(value: number, suffix: string): string;
+  function n(value: number, suffix?: unknown) {
+    const factorized = value * factor;
+
+    if (typeof suffix === "string") {
+      return `${factorized}${suffix}`;
+    }
+
+    return factorized;
+  }
+  /* eslint-enable no-unused-vars */
+
+  function px(value: number) {
+    return n(value, "px");
+  }
+
+  return { n, px };
+}
+
 export async function GET(request: NextRequest) {
   const parameters = Object.fromEntries(request.nextUrl.searchParams);
   const videoId = new URL(
@@ -87,7 +111,12 @@ export async function GET(request: NextRequest) {
     path.join(fontsDirectory, "Roboto-Medium.ttf")
   );
 
-  const width = 450;
+  const parameterSize = Number(parameters.size);
+  const { n, px } = createFactor(
+    Math.max(0, Math.min(6, isNaN(parameterSize) ? 3 : parameterSize))
+  );
+
+  const width = n(450);
 
   const videoDetails = await fetchVideoDetails(videoId);
 
@@ -103,15 +132,15 @@ export async function GET(request: NextRequest) {
           display: "flex",
           flexDirection: "column",
           backgroundColor: "white",
-          padding: "30px",
-          borderRadius: "40px",
+          padding: px(30),
+          borderRadius: px(40),
         }}
       >
         <div
           style={{
             display: "flex",
-            marginBottom: "20px",
-            borderRadius: "12px",
+            marginBottom: px(20),
+            borderRadius: px(12),
             overflow: "hidden",
             position: "relative",
           }}
@@ -121,14 +150,14 @@ export async function GET(request: NextRequest) {
             <div
               style={{
                 position: "absolute",
-                bottom: "4px",
-                right: "4px",
+                bottom: px(4),
+                right: px(4),
                 backgroundColor: "#2a2a2a",
-                borderRadius: "6px",
+                borderRadius: px(6),
                 color: "white",
-                fontSize: "12px",
+                fontSize: px(12),
                 fontWeight: 500,
-                padding: "4px",
+                padding: px(4),
               }}
             >
               {videoDetails.duration}
@@ -139,7 +168,7 @@ export async function GET(request: NextRequest) {
               position: "absolute",
               bottom: "0",
               left: "0",
-              height: "4px",
+              height: px(4),
               width: "100%",
               display: "flex",
               backgroundColor: "rgba(200, 200, 200, 0.6)",
@@ -152,8 +181,8 @@ export async function GET(request: NextRequest) {
           style={{
             color: "#0f0f0f",
             fontWeight: 500,
-            fontSize: "16px",
-            marginBottom: "12px",
+            fontSize: px(16),
+            marginBottom: px(12),
           }}
         >
           {videoDetails.title}
@@ -162,8 +191,8 @@ export async function GET(request: NextRequest) {
           <div
             style={{
               display: "flex",
-              gap: "4px",
-              fontSize: "14px",
+              gap: px(4),
+              fontSize: px(14),
               color: "#606060",
             }}
           >
