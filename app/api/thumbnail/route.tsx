@@ -158,18 +158,22 @@ export async function GET(request: NextRequest) {
         >
           {videoDetails.title}
         </div>
-        <div
-          style={{
-            display: "flex",
-            gap: "4px",
-            fontSize: "14px",
-            color: "#606060",
-          }}
-        >
-          {!parameters.noViews && <span>{videoDetails.views} vues</span>}
-          <span>·</span>
-          {!parameters.noPublishedAt && <span>{videoDetails.publishedAt}</span>}
-        </div>
+        {(!parameters.noViews || !parameters.noPublishedAt) && (
+          <div
+            style={{
+              display: "flex",
+              gap: "4px",
+              fontSize: "14px",
+              color: "#606060",
+            }}
+          >
+            {!parameters.noViews && <span>{videoDetails.views} vues</span>}
+            {!parameters.noViews && !parameters.noPublishedAt && <span>·</span>}
+            {!parameters.noPublishedAt && (
+              <span>{videoDetails.publishedAt}</span>
+            )}
+          </div>
+        )}
       </div>
     ),
     {
