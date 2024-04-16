@@ -49,9 +49,7 @@ async function fetchVideoDetails(videoId: string) {
     video.statistics?.viewCount ? Number(video.statistics?.viewCount) : 0
   );
 
-  const duration = dayjs
-    .duration(video.contentDetails?.duration ?? "PT0S")
-    .format("mm:ss");
+  const duration = dayjs.duration(video.contentDetails?.duration ?? "PT0S");
 
   const publishedAt = dayjs(
     video.snippet?.publishedAt
@@ -62,7 +60,10 @@ async function fetchVideoDetails(videoId: string) {
   return {
     title,
     thumbnail,
-    duration,
+    duration:
+      duration.hours() > 0
+        ? duration.format("HH:mm:ss")
+        : duration.format("mm:ss"),
     views,
     publishedAt,
   };
