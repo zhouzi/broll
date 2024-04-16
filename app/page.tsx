@@ -29,12 +29,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { getVideoId } from "@/lib/youtube";
 
 const FormSchema = z.object({
   videoUrl: z
     .string()
     .url()
-    .refine((value) => new URL(value).searchParams.has("v"), {
+    .refine((value) => getVideoId(value) != null, {
       message: "Le format de l'URL est invalide",
     }),
   noDuration: z.boolean(),

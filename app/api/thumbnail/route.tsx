@@ -8,7 +8,9 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
+
 import "dayjs/locale/fr";
+import { getVideoId } from "@/lib/youtube";
 
 dayjs.locale("fr");
 dayjs.extend(duration);
@@ -94,9 +96,9 @@ function createFactor(factor: number) {
 
 export async function GET(request: NextRequest) {
   const parameters = Object.fromEntries(request.nextUrl.searchParams);
-  const videoId = new URL(
+  const videoId = getVideoId(
     parameters.videoUrl ?? "https://www.youtube.com/watch?v=XEO3duW1A80"
-  ).searchParams.get("v");
+  );
 
   if (videoId == null) {
     return new Response("L'URL de la vidéo YouTube est invalide", {
