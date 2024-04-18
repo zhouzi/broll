@@ -154,46 +154,6 @@ export default function Home() {
                   />
                   <FormField
                     control={form.control}
-                    name="theme.options.progressBar"
-                    render={({ field: { value, onChange } }) => (
-                      <>
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={typeof value === "number"}
-                              onCheckedChange={(checked) =>
-                                onChange(checked ? 100 : undefined)
-                              }
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Afficher la progression de lecture
-                          </FormLabel>
-                        </FormItem>
-                        {value && (
-                          <FormItem>
-                            <FormLabel>
-                              Progression de lecture {value}%
-                            </FormLabel>
-                            <FormControl>
-                              <Slider
-                                min={0}
-                                max={100}
-                                step={1}
-                                value={[value]}
-                                onValueChange={([newValue]) =>
-                                  onChange(newValue)
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      </>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
                     name="theme.options.showDuration"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -241,6 +201,46 @@ export default function Home() {
                           Afficher la date de publication
                         </FormLabel>
                       </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="theme.options.progressBar"
+                    render={({ field: { value, onChange } }) => (
+                      <>
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={typeof value === "number"}
+                              onCheckedChange={(checked) =>
+                                onChange(checked ? 100 : undefined)
+                              }
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            Afficher la progression de lecture
+                          </FormLabel>
+                        </FormItem>
+                        {value && (
+                          <FormItem>
+                            <FormLabel>
+                              Progression de lecture {value}%
+                            </FormLabel>
+                            <FormControl>
+                              <Slider
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={[value]}
+                                onValueChange={([newValue]) =>
+                                  onChange(newValue)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      </>
                     )}
                   />
                   <FormField

@@ -1,4 +1,4 @@
-import { Inter as FontSans } from "next/font/google";
+import { Outfit as FontSans } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,9 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "custom-youtube-thumbnail",
+  title: "broll.gabin.app",
   description:
-    "Proposition de Gabin, d'après une idée de BastiUI et un challenge de BenjaminCode.",
+    "Éditeur de vignette personnalisée YouTube pour incrustation en b-roll, illustration réseaux sociaux, et autres.",
 };
 
 export default function RootLayout({
