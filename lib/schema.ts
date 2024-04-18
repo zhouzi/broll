@@ -45,6 +45,7 @@ export const videoDetails = z.object({
       return dayjs(new Date(value)).fromNow();
     }),
 });
+export type VideoDetails = z.infer<typeof videoDetails>;
 
 export const card = z.object({
   fontSize: z.number().min(0).max(2).default(1),
@@ -77,6 +78,7 @@ export const theme = z.object({
   progressBar,
   options,
 });
+export type Theme = z.infer<typeof theme>;
 
 export function getVideoId(href: string) {
   try {
@@ -93,15 +95,3 @@ export function getVideoId(href: string) {
 
   return null;
 }
-
-export const message = z.object({
-  videoUrl: z
-    .string()
-    .url()
-    .default("https://www.youtube.com/watch?v=XEO3duW1A80")
-    .refine((value) => getVideoId(value) != null, {
-      message: "Le format de l'URL est invalide",
-    }),
-  theme,
-});
-export type Message = z.infer<typeof message>;

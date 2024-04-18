@@ -1,10 +1,14 @@
-/* eslint-disable @next/next/no-img-element, react/no-unescaped-entities */
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useReducer } from "react";
+import { Download } from "lucide-react";
+import { Roboto } from "next/font/google";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 
+import { ThumbnailPreview, createScale } from "@/components/thumbnail-preview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,23 +28,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import * as queryString from "@/lib/query-string";
 import * as schema from "@/lib/schema";
+import { useDownloadPNG } from "@/lib/use-download-png";
+import { useVideoDetails } from "@/lib/use-video-details";
+import { cn } from "@/lib/utils";
 
-function createApiUrl(values: schema.Message, cacheBuster?: number) {
-  return `/api/thumbnail?${queryString.stringify(
-    cacheBuster ? { ...values, cacheBuster } : values
-  )}`;
-}
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
 
-type Action = { type: "load"; message: schema.Message } | { type: "loaded" };
+const formSchema = z.object({
+  videoUrl: z
+    .string()
+    .url()
+    .default("https://www.youtube.com/watch?v=XEO3duW1A80")
+    .refine((value) => schema.getVideoId(value) != null, {
+      message: "Le format de l'URL est invalide",
+    }),
+  theme: schema.theme,
+});
 
-interface State {
-  href: string;
-  loading: boolean;
-}
-
-const defaultValues = schema.message.parse({
+const defaultValues = formSchema.parse({
   theme: {
     card: schema.card.parse({}),
     duration: schema.duration.parse({}),
@@ -49,36 +58,36 @@ const defaultValues = schema.message.parse({
   },
 });
 
-const initialState: State = {
-  href: createApiUrl(defaultValues),
-  loading: false,
-};
-
 export default function Home() {
-  const form = useForm<schema.Message>({
-    resolver: zodResolver(schema.message),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues,
   });
-  const [state, dispatch] = useReducer((prevState: State, action: Action) => {
-    switch (action.type) {
-      case "load":
-        return {
-          href: createApiUrl(action.message, Date.now()),
-          loading: true,
-        };
-      case "loaded":
-        return {
-          ...prevState,
-          loading: false,
-        };
-      default:
-        return prevState;
-    }
-  }, initialState);
 
-  function onSubmit(message: schema.Message) {
-    dispatch({ type: "load", message });
-  }
+  const videoDetails = useVideoDetails(form.watch("videoUrl"));
+  const theme = form.watch("theme");
+
+  const downloadPNG = useDownloadPNG({ videoDetails, theme });
+
+  useEffect(() => {
+    try {
+      const localTheme = schema.theme.parse(
+        JSON.parse(localStorage.getItem("theme") ?? "{}")
+      );
+      form.setValue("theme", localTheme, { shouldDirty: true });
+    } catch (err) {}
+  }, [form]);
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (!form.formState.isDirty) {
+        return;
+      }
+
+      localStorage.setItem("theme", JSON.stringify(values.theme));
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <div className="max-w-[900px] py-6 px-4 m-auto">
@@ -91,10 +100,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
+                <form className="space-y-4">
                   <FormField
                     control={form.control}
                     name="videoUrl"
@@ -139,7 +145,7 @@ export default function Home() {
                                 min={0}
                                 max={100}
                                 step={1}
-                                defaultValue={[value]}
+                                value={[value]}
                                 onValueChange={([newValue]) =>
                                   onChange(newValue)
                                 }
@@ -215,7 +221,7 @@ export default function Home() {
                             min={0}
                             max={2}
                             step={0.1}
-                            defaultValue={[value]}
+                            value={[value]}
                             onValueChange={([newValue]) => onChange(newValue)}
                           />
                         </FormControl>
@@ -236,7 +242,7 @@ export default function Home() {
                             min={0}
                             max={2}
                             step={0.1}
-                            defaultValue={[value]}
+                            value={[value]}
                             onValueChange={([newValue]) => onChange(newValue)}
                           />
                         </FormControl>
@@ -257,7 +263,7 @@ export default function Home() {
                             min={0}
                             max={2}
                             step={0.1}
-                            defaultValue={[value]}
+                            value={[value]}
                             onValueChange={([newValue]) => onChange(newValue)}
                           />
                         </FormControl>
@@ -301,16 +307,13 @@ export default function Home() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={state.loading}>
-                    {state.loading ? "Génération..." : "Générer"}
-                  </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </div>
         <div
-          className="py-8 px-4 flex justify-center"
+          className="py-8 px-4 flex flex-col gap-4 items-center justify-center relative"
           style={{
             // Source: https://sharkcoder.com/images/background
             background: "#eee",
@@ -320,13 +323,18 @@ export default function Home() {
             backgroundSize: "50px 50px",
           }}
         >
-          <img
-            className="object-contain"
-            src={state.href}
-            alt=""
-            width="450"
-            onLoad={() => dispatch({ type: "loaded" })}
-          />
+          <div className={cn("max-w-[450px]", roboto.className)}>
+            <ThumbnailPreview
+              videoDetails={videoDetails}
+              theme={theme}
+              scale={createScale(theme, 1)}
+            />
+          </div>
+          <div>
+            <Button onClick={downloadPNG}>
+              <Download className="mr-2 h-4 w-4" /> Télécharger
+            </Button>
+          </div>
         </div>
       </main>
       <footer className="py-8 text-center">
