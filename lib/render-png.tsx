@@ -7,7 +7,6 @@ import { Fonts } from "./use-fonts-ref";
 
 interface MessageData {
   _id: number;
-  url: string;
   blob: Blob;
 }
 
@@ -81,10 +80,10 @@ export async function renderPNG({
       ],
     }
   );
-  const url = (await convertSVGToPNG?.({
+  const messageData = (await convertSVGToPNG?.({
     svg,
     width: scale.width,
   }))!;
 
-  return url;
+  return messageData;
 }

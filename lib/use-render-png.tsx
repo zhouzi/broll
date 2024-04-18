@@ -65,11 +65,12 @@ export function useRenderPNG({
 
       setRenderStatusRef.current("downloading");
 
-      const { url } = await renderPNG({
+      const { blob } = await renderPNG({
         fonts: fontsRef.current,
         videoDetails,
         theme,
       });
+      const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
