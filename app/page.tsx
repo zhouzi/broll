@@ -2,8 +2,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Download } from "lucide-react";
+import { Download, Github, Linkedin, Twitter } from "lucide-react";
 import { Roboto } from "next/font/google";
+import Link from "next/link";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -91,6 +92,40 @@ export default function Home() {
 
   return (
     <div className="max-w-[900px] py-6 px-4 m-auto">
+      <header className="py-4 flex justify-between items-center">
+        <Link href="/" className="inline-flex items-baseline gap-[0.15rem]">
+          <span className="text-2xl font-black">broll</span>
+          <span className="inline-flex size-2 bg-red-600 rounded-full" />
+          <span className="text-muted-foreground">gabin.app</span>
+        </Link>
+        <nav>
+          <ul className="flex items-center">
+            {[
+              {
+                Icon: Twitter,
+                href: "https://go.gabin.app/twitter",
+              },
+              {
+                Icon: Linkedin,
+                href: "https://go.gabin.app/linkedin",
+              },
+              {
+                Icon: Github,
+                href: "https://go.gabin.app/github",
+              },
+            ].map(({ Icon, href }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  className="inline-flex p-2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Icon size={16} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
       <main className="flex flex-col-reverse md:flex-row gap-8">
         <div className="flex-1">
           <Card>
@@ -337,7 +372,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <footer className="py-8 text-center">
+      <footer className="py-8 flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
           D'après une demande de{" "}
           <a
