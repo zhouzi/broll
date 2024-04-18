@@ -3,18 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { youtube } from "@googleapis/youtube";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-import "dayjs/locale/fr";
-import { getVideoId } from "@/lib/youtube";
-
-dayjs.locale("fr");
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
+import * as queryString from "@/lib/query-string";
+import * as schema from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -37,74 +30,53 @@ async function fetchVideoDetails(videoId: string) {
 
   const [video] = items;
 
-  const title = video.snippet?.title ?? "Untitled";
-
-  const thumbnail =
-    video.snippet?.thumbnails?.maxres?.url ??
-    "https://i3.ytimg.com/vi/XEO3duW1A80/maxresdefault.jpg";
-
-  const formatter = new Intl.NumberFormat("fr-FR", {
-    notation: "compact",
-    compactDisplay: "short",
+  return schema.videoDetails.parse({
+    title: video.snippet?.title,
+    thumbnail: video.snippet?.thumbnails?.maxres?.url,
+    duration: video.contentDetails?.duration,
+    views: video.statistics?.viewCount,
+    publishedAt: video.snippet?.publishedAt,
   });
-  const views = formatter.format(
-    video.statistics?.viewCount ? Number(video.statistics?.viewCount) : 0
-  );
-
-  const duration = dayjs.duration(video.contentDetails?.duration ?? "PT0S");
-
-  const publishedAt = dayjs(
-    video.snippet?.publishedAt
-      ? new Date(video.snippet?.publishedAt)
-      : new Date()
-  ).fromNow();
-
-  return {
-    title,
-    thumbnail,
-    duration:
-      duration.hours() > 0
-        ? duration.format("HH:mm:ss")
-        : duration.format("mm:ss"),
-    views,
-    publishedAt,
-  };
 }
 
-function createFactor(factor: number) {
-  // eslint no-unused-vars is complaining about the function overload
-  /* eslint-disable no-unused-vars */
-  function n(value: number): number;
-  function n(value: number, suffix: string): string;
-  function n(value: number, suffix?: unknown) {
-    const factorized = value * factor;
-
-    if (typeof suffix === "string") {
-      return `${factorized}${suffix}`;
-    }
-
-    return factorized;
+function createScale(message: schema.Message, baseScale: number) {
+  function n(value: number) {
+    return value * baseScale;
   }
-  /* eslint-enable no-unused-vars */
 
   function px(value: number) {
-    return n(value, "px");
+    return `${n(value)}px`;
   }
 
-  return { n, px };
+  function fontSize(scale: number) {
+    return `${n(16 * scale) * message.theme.card.fontSize}px`;
+  }
+
+  function spacing(scale: number) {
+    return `${n(4 * scale) * message.theme.card.spacing}px`;
+  }
+
+  function borderRadius(scale: number) {
+    return `${n(6 * scale) * message.theme.card.borderRadius}px`;
+  }
+
+  return { n, px, fontSize, spacing, borderRadius };
 }
 
 export async function GET(request: NextRequest) {
-  const parameters = Object.fromEntries(request.nextUrl.searchParams);
-  const videoId = getVideoId(
-    parameters.videoUrl ?? "https://www.youtube.com/watch?v=XEO3duW1A80"
+  const message = schema.message.parse(
+    queryString.parse(request.nextUrl.search)
   );
+
+  const videoId = schema.getVideoId(message.videoUrl);
 
   if (videoId == null) {
     return new Response("L'URL de la vidéo YouTube est invalide", {
       status: 400,
     });
   }
+
+  const videoDetails = await fetchVideoDetails(videoId);
 
   const fontsDirectory = path.join(process.cwd(), "fonts");
   const robotoRegular = await fs.readFile(
@@ -114,27 +86,13 @@ export async function GET(request: NextRequest) {
     path.join(fontsDirectory, "Roboto-Medium.ttf")
   );
 
-  const parameterSize = Number(parameters.size);
-  const { n, px } = createFactor(
-    Math.max(0, Math.min(6, isNaN(parameterSize) ? 3 : parameterSize))
+  const { n, px, fontSize, spacing, borderRadius } = createScale(
+    message,
+    // FIXME: make it customizeable
+    3
   );
 
   const width = n(450);
-
-  const videoDetails = await fetchVideoDetails(videoId);
-
-  const parameterProgress = Number(parameters.progress);
-  const progress = isNaN(parameterProgress)
-    ? "100%"
-    : `${Math.max(0, Math.min(100, parameterProgress))}%`;
-
-  const [
-    cardBackground = "#ffffff",
-    textForegroundMuted = "#606060",
-    textForeground = "#0f0f0f",
-    durationBackground = "#2a2a2a",
-    progressForeground = "#ff0000",
-  ] = parameters.theme?.split(",") ?? [];
 
   return new ImageResponse(
     (
@@ -142,76 +100,85 @@ export async function GET(request: NextRequest) {
         style={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: cardBackground,
-          padding: px(30),
-          borderRadius: px(40),
+          backgroundColor: message.theme.card.background,
+          padding: spacing(7.5),
+          borderRadius: borderRadius(6),
         }}
       >
         <div
           style={{
             display: "flex",
-            marginBottom: px(20),
-            borderRadius: px(12),
+            marginBottom: spacing(5),
+            borderRadius: borderRadius(2),
             overflow: "hidden",
             position: "relative",
           }}
         >
           <img src={videoDetails.thumbnail} alt="" />
-          {!parameters.noDuration && (
+          {message.theme.options.showDuration && (
             <div
               style={{
                 position: "absolute",
                 bottom: px(4),
                 right: px(4),
-                backgroundColor: durationBackground,
-                borderRadius: px(6),
-                color: "#ffffff",
-                fontSize: px(12),
+                color: message.theme.duration.foreground,
+                backgroundColor: message.theme.duration.background,
+                borderRadius: borderRadius(1),
+                fontSize: fontSize(0.75),
                 fontWeight: 500,
-                padding: px(4),
+                padding: spacing(1),
               }}
             >
               {videoDetails.duration}
             </div>
           )}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "0",
-              left: "0",
-              height: px(4),
-              width: "100%",
-              display: "flex",
-              backgroundColor: "rgba(200, 200, 200, 0.6)",
-            }}
-          >
+          {typeof message.theme.options.progressBar === "number" && (
             <div
-              style={{ width: progress, backgroundColor: progressForeground }}
-            />
-          </div>
+              style={{
+                position: "absolute",
+                bottom: "0",
+                left: "0",
+                height: px(4),
+                width: "100%",
+                display: "flex",
+                backgroundColor: message.theme.progressBar.background,
+              }}
+            >
+              <div
+                style={{
+                  width: `${message.theme.options.progressBar}%`,
+                  backgroundColor: message.theme.progressBar.foreground,
+                }}
+              />
+            </div>
+          )}
         </div>
         <div
           style={{
-            color: textForeground,
+            color: message.theme.card.foreground,
             fontWeight: 500,
-            fontSize: px(16),
-            marginBottom: px(12),
+            fontSize: fontSize(1),
+            marginBottom: spacing(3),
           }}
         >
           {videoDetails.title}
         </div>
-        {(!parameters.noViews || !parameters.noPublishedAt) && (
+        {(message.theme.options.showViews ||
+          message.theme.options.showPublishedAt) && (
           <div
             style={{
               display: "flex",
-              gap: px(4),
-              fontSize: px(14),
-              color: textForegroundMuted,
+              gap: spacing(1),
+              fontSize: fontSize(0.875),
+              color: message.theme.card.foregroundMuted,
             }}
           >
-            {!parameters.noViews && <span>{videoDetails.views} vues</span>}
-            {!parameters.noViews && !parameters.noPublishedAt && <span>·</span>}
-            {!parameters.noPublishedAt && (
+            {message.theme.options.showViews && (
+              <span>{videoDetails.views} vues</span>
+            )}
+            {message.theme.options.showViews &&
+              message.theme.options.showPublishedAt && <span>·</span>}
+            {message.theme.options.showPublishedAt && (
               <span>{videoDetails.publishedAt}</span>
             )}
           </div>
