@@ -258,6 +258,34 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="theme.card.background"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 flex items-center">
+                      <FormLabel className="flex-1">
+                        Arrière plan carte
+                      </FormLabel>
+                      <FormControl className="w-16">
+                        <Input type="color" placeholder="#ffffff" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="theme.card.foreground"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 flex items-center">
+                      <FormLabel className="flex-1">Texte</FormLabel>
+                      <FormControl className="w-16">
+                        <Input type="color" placeholder="#ffffff" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" disabled={state.loading}>
                   {state.loading ? "Génération..." : "Générer"}
                 </Button>

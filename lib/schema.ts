@@ -49,7 +49,6 @@ export const videoDetails = z.object({
 export const card = z.object({
   fontSize: z.number().min(0).max(2).default(1),
   foreground: z.string().default("#0f0f0f"),
-  foregroundMuted: z.string().default("#606060"),
   background: z.string().default("#ffffff"),
   spacing: z.number().min(0).max(2).default(1),
   borderRadius: z.number().min(0).max(2).default(1),

@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { youtube } from "@googleapis/youtube";
+import Color from "color";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
@@ -170,7 +171,7 @@ export async function GET(request: NextRequest) {
               display: "flex",
               gap: spacing(1),
               fontSize: fontSize(0.875),
-              color: message.theme.card.foregroundMuted,
+              color: Color(message.theme.card.foreground).fade(0.4).toString(),
             }}
           >
             {message.theme.options.showViews && (
