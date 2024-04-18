@@ -2,14 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
+export interface Fonts {
+  robotoRegular: ArrayBuffer;
+  robotoMedium: ArrayBuffer;
+}
+
 export function useFontsRef() {
-  const fontsRef = useRef<
-    | {
-        robotoRegular: ArrayBuffer;
-        robotoMedium: ArrayBuffer;
-      }
-    | undefined
-  >(undefined);
+  const fontsRef = useRef<Fonts | undefined>(undefined);
 
   useEffect(() => {
     const abortContoller = new AbortController();

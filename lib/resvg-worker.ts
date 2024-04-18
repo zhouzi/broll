@@ -14,6 +14,8 @@ self.onmessage = (e) => {
   });
   const image = renderer.render();
   const pngBuffer = image.asPng();
-  const url = URL.createObjectURL(new Blob([pngBuffer], { type: "image/png" }));
-  self.postMessage({ _id, url });
+  const blob = new Blob([pngBuffer], { type: "image/png" });
+  const url = URL.createObjectURL(blob);
+
+  self.postMessage({ _id, blob, url });
 };

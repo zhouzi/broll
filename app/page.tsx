@@ -3,6 +3,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Copy,
   Download,
   Github,
   Linkedin,
@@ -36,7 +37,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import * as schema from "@/lib/schema";
-import { DownloadStatus, useDownloadPNG } from "@/lib/use-download-png";
+import { RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
 import { cn } from "@/lib/utils";
 
@@ -75,12 +76,12 @@ export default function Home() {
   const videoDetails = useVideoDetails(form.watch("videoUrl"));
   const theme = form.watch("theme");
 
-  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus>("idle");
+  const [renderStatus, setRenderStatus] = useState<RenderStatus>("idle");
 
-  const downloadPNG = useDownloadPNG({
+  const { downloadPNG, copyPNG } = useRenderPNG({
     videoDetails,
     theme,
-    setDownloadStatus,
+    setRenderStatus,
   });
 
   useEffect(() => {
@@ -410,12 +411,9 @@ export default function Home() {
               scale={createScale(theme, 1)}
             />
           </div>
-          <div>
-            <Button
-              onClick={downloadPNG}
-              disabled={downloadStatus === "inprogress"}
-            >
-              {downloadStatus === "inprogress" ? (
+          <div className="flex gap-2">
+            <Button onClick={downloadPNG} disabled={renderStatus !== "idle"}>
+              {renderStatus === "downloading" ? (
                 <>
                   <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />{" "}
                   Téléchargement...
@@ -424,6 +422,18 @@ export default function Home() {
                 <>
                   <Download className="mr-2 h-4 w-4" /> Télécharger
                 </>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={copyPNG}
+              disabled={renderStatus !== "idle"}
+            >
+              {renderStatus === "copying" ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Copy className="size-4" />
               )}
             </Button>
           </div>
