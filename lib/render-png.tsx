@@ -56,7 +56,6 @@ export async function renderPNG({
   theme,
 }: RenderPNGProps) {
   const scale = createScale(theme, 6);
-  const width = scale.n(450);
 
   const svg = await satori(
     <ThumbnailPreview
@@ -65,7 +64,7 @@ export async function renderPNG({
       scale={scale}
     />,
     {
-      width,
+      width: scale.width,
       fonts: [
         {
           name: "Roboto",
@@ -84,7 +83,7 @@ export async function renderPNG({
   );
   const url = (await convertSVGToPNG?.({
     svg,
-    width,
+    width: scale.width,
   }))!;
 
   return url;

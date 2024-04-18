@@ -31,7 +31,7 @@ export function createScale(theme: schema.Theme, baseScale: number) {
     return `${n(6 * scale) * theme.card.borderRadius}px`;
   }
 
-  return { n, px, text, spacing, borderRadius };
+  return { n, px, text, spacing, borderRadius, width: n(450) };
 }
 
 interface ThumbnailPreviewProps {
@@ -43,7 +43,7 @@ interface ThumbnailPreviewProps {
 export function ThumbnailPreview({
   videoDetails,
   theme,
-  scale: { px, text, spacing, borderRadius },
+  scale: { px, text, spacing, borderRadius, width },
 }: ThumbnailPreviewProps) {
   return (
     <div
@@ -53,6 +53,7 @@ export function ThumbnailPreview({
         backgroundColor: theme.card.background,
         padding: spacing(7.5),
         borderRadius: borderRadius(6),
+        width: `${width}px`,
       }}
     >
       <div
@@ -117,8 +118,8 @@ export function ThumbnailPreview({
         <div
           style={{
             display: "flex",
+            flex: 1,
             flexDirection: "column",
-            minWidth: 0,
           }}
         >
           <div
@@ -145,21 +146,18 @@ export function ThumbnailPreview({
           {(theme.options.showViews || theme.options.showPublishedAt) && (
             <div
               style={{
-                display: "flex",
-                gap: px(4),
                 color: Color(theme.card.foreground).fade(0.4).toString(),
                 ...text(0.875),
                 fontWeight: 400,
                 marginTop: text(0.2).fontSize,
               }}
             >
-              {theme.options.showViews && <span>{videoDetails.views}</span>}
-              {theme.options.showViews && theme.options.showPublishedAt && (
-                <span>·</span>
-              )}
-              {theme.options.showPublishedAt && (
-                <span>{videoDetails.publishedAt}</span>
-              )}
+              {[
+                theme.options.showViews && videoDetails.views,
+                theme.options.showPublishedAt && videoDetails.publishedAt,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </div>
           )}
         </div>

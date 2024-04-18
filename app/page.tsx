@@ -39,7 +39,6 @@ import { Slider } from "@/components/ui/slider";
 import * as schema from "@/lib/schema";
 import { RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
-import { cn } from "@/lib/utils";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -404,7 +403,7 @@ export default function Home() {
             backgroundSize: "50px 50px",
           }}
         >
-          <div className={cn("max-w-[450px]", roboto.className)}>
+          <div className={roboto.className}>
             <ThumbnailPreview
               videoDetails={videoDetails}
               theme={theme}
