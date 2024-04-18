@@ -74,7 +74,7 @@ export function ThumbnailPreview({
               color: theme.duration.foreground,
               backgroundColor: theme.duration.background,
               borderRadius: borderRadius(1),
-              padding: spacing(1),
+              padding: `${text(0.1).fontSize} ${text(0.2).fontSize}`,
               ...text(0.75),
             }}
           >
@@ -102,7 +102,7 @@ export function ThumbnailPreview({
           </div>
         )}
       </div>
-      <div style={{ display: "flex", gap: spacing(4) }}>
+      <div style={{ display: "flex", gap: text(0.6).fontSize }}>
         {theme.options.showChannelThumbnail && (
           <img
             src={videoDetails.channel.thumbnail}
@@ -124,7 +124,7 @@ export function ThumbnailPreview({
           <div
             style={{
               color: theme.card.foreground,
-              marginBottom: spacing(2),
+              marginBottom: text(0.35).fontSize,
               ...text(1),
             }}
           >
@@ -150,7 +150,7 @@ export function ThumbnailPreview({
                 color: Color(theme.card.foreground).fade(0.4).toString(),
                 ...text(0.875),
                 fontWeight: 400,
-                marginTop: spacing(1),
+                marginTop: text(0.2).fontSize,
               }}
             >
               {theme.options.showViews && <span>{videoDetails.views}</span>}
