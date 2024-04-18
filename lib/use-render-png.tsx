@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { toast } from "sonner";
 
 import * as schema from "@/lib/schema";
 
@@ -53,6 +54,7 @@ export function useRenderPNG({
       });
 
       navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      toast.success("Image copié dans ton presse papier");
 
       setRenderStatusRef.current("idle");
     };
