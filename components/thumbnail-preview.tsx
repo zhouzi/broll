@@ -121,7 +121,7 @@ export function ThumbnailPreview({
             fontWeight: 400,
           }}
         >
-          {theme.options.showViews && <span>{videoDetails.views} vues</span>}
+          {theme.options.showViews && <span>{videoDetails.views}</span>}
           {theme.options.showViews && theme.options.showPublishedAt && (
             <span>·</span>
           )}
