@@ -59,7 +59,7 @@ export function useDownloadPNG({ videoDetails, theme }: UseDownloadPNGProps) {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = videoDetails.title;
+      a.download = `${videoDetails.title}.png`;
       a.click();
     };
   }, [fontsRef, theme, videoDetails]);
