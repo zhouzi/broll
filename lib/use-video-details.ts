@@ -7,7 +7,9 @@ import { fetchVideoDetails } from "./fetch-video-details.action";
 
 export function useVideoDetails(videoUrl: string) {
   const [videoDetails, setVideoDetails] = useState(
-    schema.videoDetails.parse({})
+    schema.videoDetails.parse({
+      channel: {},
+    })
   );
 
   const videoId = schema.getVideoId(videoUrl);
@@ -19,16 +21,26 @@ export function useVideoDetails(videoUrl: string) {
     }
 
     fetchVideoDetails(videoId).then((videoDetails) => {
-      fetch(`/api/base64?href=${videoDetails.thumbnail}`).then((res) => {
-        if (res.ok) {
-          res.text().then((base64) => {
-            if (cancelled) {
-              return;
-            }
-
-            setVideoDetails({ ...videoDetails, thumbnail: base64 });
-          });
+      Promise.all([
+        fetch(`/api/base64?href=${videoDetails.thumbnail}`).then((res) =>
+          res.text()
+        ),
+        fetch(`/api/base64?href=${videoDetails.channel.thumbnail}`).then(
+          (res) => res.text()
+        ),
+      ]).then(([thumbnail, channelThumbnail]) => {
+        if (cancelled) {
+          return;
         }
+
+        setVideoDetails({
+          ...videoDetails,
+          thumbnail,
+          channel: {
+            ...videoDetails.channel,
+            thumbnail: channelThumbnail,
+          },
+        });
       });
     });
 

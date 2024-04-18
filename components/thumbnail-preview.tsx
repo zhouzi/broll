@@ -102,34 +102,68 @@ export function ThumbnailPreview({
           </div>
         )}
       </div>
-      <div
-        style={{
-          color: theme.card.foreground,
-          marginBottom: spacing(2),
-          ...text(1),
-        }}
-      >
-        {videoDetails.title}
-      </div>
-      {(theme.options.showViews || theme.options.showPublishedAt) && (
+      <div style={{ display: "flex", gap: spacing(4) }}>
+        {theme.options.showChannelThumbnail && (
+          <img
+            src={videoDetails.channel.thumbnail}
+            alt=""
+            style={{
+              borderRadius: "100%",
+              width: text(2.6).fontSize,
+              height: text(2.6).fontSize,
+            }}
+          />
+        )}
         <div
           style={{
             display: "flex",
-            gap: px(4),
-            color: Color(theme.card.foreground).fade(0.4).toString(),
-            ...text(0.875),
-            fontWeight: 400,
+            flexDirection: "column",
+            minWidth: 0,
           }}
         >
-          {theme.options.showViews && <span>{videoDetails.views}</span>}
-          {theme.options.showViews && theme.options.showPublishedAt && (
-            <span>·</span>
+          <div
+            style={{
+              color: theme.card.foreground,
+              marginBottom: spacing(2),
+              ...text(1),
+            }}
+          >
+            {videoDetails.title}
+          </div>
+          {theme.options.showChannelTitle && (
+            <div
+              style={{
+                display: "flex",
+                color: Color(theme.card.foreground).fade(0.4).toString(),
+                ...text(0.875),
+                fontWeight: 400,
+              }}
+            >
+              {videoDetails.channel.title}
+            </div>
           )}
-          {theme.options.showPublishedAt && (
-            <span>{videoDetails.publishedAt}</span>
+          {(theme.options.showViews || theme.options.showPublishedAt) && (
+            <div
+              style={{
+                display: "flex",
+                gap: px(4),
+                color: Color(theme.card.foreground).fade(0.4).toString(),
+                ...text(0.875),
+                fontWeight: 400,
+                marginTop: spacing(1),
+              }}
+            >
+              {theme.options.showViews && <span>{videoDetails.views}</span>}
+              {theme.options.showViews && theme.options.showPublishedAt && (
+                <span>·</span>
+              )}
+              {theme.options.showPublishedAt && (
+                <span>{videoDetails.publishedAt}</span>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

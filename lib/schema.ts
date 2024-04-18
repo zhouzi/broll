@@ -9,6 +9,17 @@ dayjs.locale("fr");
 dayjs.extend(durationPlugin);
 dayjs.extend(relativeTimePlugin);
 
+export const channel = z.object({
+  title: z.string().default("Basti Ui"),
+  thumbnail: z
+    .string()
+    .url()
+    .default(
+      "https://yt3.ggpht.com/ePr4Q4DVIpU8GBSk0bAkias_6GJivzuuiHQQb804UT9eNw3BbEUWNhV9dLIjIbWf7SZbLa6tYg=s800-c-k-c0x00ffffff-no-rj"
+    ),
+});
+export type Channel = z.infer<typeof channel>;
+
 export const videoDetails = z.object({
   title: z.string().default("Je quitte mon CDI de Designer"),
   thumbnail: z
@@ -44,6 +55,7 @@ export const videoDetails = z.object({
     .transform((value) => {
       return dayjs(new Date(value)).fromNow();
     }),
+  channel,
 });
 export type VideoDetails = z.infer<typeof videoDetails>;
 
@@ -69,6 +81,8 @@ export const options = z.object({
   showDuration: z.boolean().default(true),
   showViews: z.boolean().default(true),
   showPublishedAt: z.boolean().default(true),
+  showChannelThumbnail: z.boolean().default(true),
+  showChannelTitle: z.boolean().default(true),
   progressBar: z.number().min(0).max(100).optional(),
 });
 

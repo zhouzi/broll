@@ -172,6 +172,40 @@ export default function Home() {
                   />
                   <FormField
                     control={form.control}
+                    name="theme.options.showChannelThumbnail"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Afficher le logo de la chaîne
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="theme.options.showChannelTitle"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Afficher le nom de la chaîne
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="theme.options.showViews"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -309,12 +343,10 @@ export default function Home() {
                   />
                   <FormField
                     control={form.control}
-                    name="theme.card.background"
+                    name="theme.card.foreground"
                     render={({ field }) => (
                       <FormItem className="space-y-0 flex items-center">
-                        <FormLabel className="flex-1">
-                          Arrière plan carte
-                        </FormLabel>
+                        <FormLabel className="flex-1">Texte</FormLabel>
                         <FormControl className="w-16">
                           <Input
                             type="color"
@@ -328,10 +360,10 @@ export default function Home() {
                   />
                   <FormField
                     control={form.control}
-                    name="theme.card.foreground"
+                    name="theme.card.background"
                     render={({ field }) => (
                       <FormItem className="space-y-0 flex items-center">
-                        <FormLabel className="flex-1">Texte</FormLabel>
+                        <FormLabel className="flex-1">Arrière plan</FormLabel>
                         <FormControl className="w-16">
                           <Input
                             type="color"
