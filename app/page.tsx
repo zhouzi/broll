@@ -390,7 +390,7 @@ export default function Home() {
           </a>{" "}
           -{" "}
           <a
-            href="https://github.com/zhouzi/custom-youtube-thumbnail"
+            href="https://github.com/zhouzi/broll"
             className="transition-colors hover:text-foreground font-semibold"
           >
             Code source
