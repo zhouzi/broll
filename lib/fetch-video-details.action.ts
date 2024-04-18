@@ -24,7 +24,11 @@ export async function fetchVideoDetails(videoId: string) {
 
   return schema.videoDetails.parse({
     title: video.snippet?.title,
-    thumbnail: video.snippet?.thumbnails?.maxres?.url,
+    thumbnail:
+      video.snippet?.thumbnails?.maxres?.url ??
+      video.snippet?.thumbnails?.high?.url ??
+      video.snippet?.thumbnails?.medium?.url ??
+      video.snippet?.thumbnails?.default?.url,
     duration: video.contentDetails?.duration,
     views: video.statistics?.viewCount,
     publishedAt: video.snippet?.publishedAt,

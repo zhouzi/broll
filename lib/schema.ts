@@ -91,6 +91,21 @@ export function getVideoId(href: string) {
     if (url.hostname === "youtu.be") {
       return url.pathname.slice(1).split("/")[0];
     }
+
+    if (
+      url.hostname === "youtube.com" ||
+      url.hostname.endsWith(".youtube.com")
+    ) {
+      const parts = url.pathname.split("/").slice(1);
+
+      if (parts[0] === "shorts") {
+        return parts[1];
+      }
+
+      if (parts[0] === "live") {
+        return parts[1];
+      }
+    }
   } catch (err) {}
 
   return null;

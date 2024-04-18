@@ -61,6 +61,7 @@ const defaultValues = formSchema.parse({
 
 export default function Home() {
   const form = useForm<z.infer<typeof formSchema>>({
+    mode: "onBlur",
     resolver: zodResolver(formSchema),
     defaultValues,
   });
