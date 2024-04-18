@@ -58,7 +58,7 @@ export function ThumbnailPreview({
       <div
         style={{
           display: "flex",
-          marginBottom: spacing(5),
+          marginBottom: text(0.6).fontSize,
           borderRadius: borderRadius(2),
           overflow: "hidden",
           position: "relative",
