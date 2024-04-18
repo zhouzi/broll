@@ -2,10 +2,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Download, Github, Linkedin, Twitter } from "lucide-react";
+import {
+  Download,
+  Github,
+  Linkedin,
+  LoaderCircle,
+  Twitter,
+} from "lucide-react";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -30,7 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import * as schema from "@/lib/schema";
-import { useDownloadPNG } from "@/lib/use-download-png";
+import { DownloadStatus, useDownloadPNG } from "@/lib/use-download-png";
 import { useVideoDetails } from "@/lib/use-video-details";
 import { cn } from "@/lib/utils";
 
@@ -69,7 +75,13 @@ export default function Home() {
   const videoDetails = useVideoDetails(form.watch("videoUrl"));
   const theme = form.watch("theme");
 
-  const downloadPNG = useDownloadPNG({ videoDetails, theme });
+  const [downloadStatus, setDownloadStatus] = useState<DownloadStatus>("idle");
+
+  const downloadPNG = useDownloadPNG({
+    videoDetails,
+    theme,
+    setDownloadStatus,
+  });
 
   useEffect(() => {
     try {
@@ -399,8 +411,20 @@ export default function Home() {
             />
           </div>
           <div>
-            <Button onClick={downloadPNG}>
-              <Download className="mr-2 h-4 w-4" /> Télécharger
+            <Button
+              onClick={downloadPNG}
+              disabled={downloadStatus === "inprogress"}
+            >
+              {downloadStatus === "inprogress" ? (
+                <>
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />{" "}
+                  Téléchargement...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" /> Télécharger
+                </>
+              )}
             </Button>
           </div>
         </div>
