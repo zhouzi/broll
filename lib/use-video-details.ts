@@ -1,53 +1,57 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import * as schema from "@/lib/schema";
 
-import { fetchVideoDetails } from "./fetch-video-details.action";
+async function fetchVideoDetails(
+  videoId: string,
+  signal: AbortSignal
+): Promise<schema.VideoDetails> {
+  const res = await fetch(`/api/youtube/video/${videoId}`, { signal });
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json();
+}
 
 export function useVideoDetails(videoUrl: string) {
-  const [videoDetails, setVideoDetails] = useState(
+  const [defaultVideoDetails] = useState(() =>
     schema.videoDetails.parse({
       channel: {},
     })
   );
 
-  const videoId = schema.getVideoId(videoUrl);
-  useEffect(() => {
-    let cancelled = false;
+  const [cache, setCache] = useState<Record<string, schema.VideoDetails>>({});
+  const cacheRef = useRef(cache);
 
+  useLayoutEffect(() => {
+    cacheRef.current = cache;
+  }, [cache]);
+
+  const videoId = schema.getVideoId(videoUrl);
+
+  useEffect(() => {
     if (videoId == null) {
       return;
     }
 
-    fetchVideoDetails(videoId).then((videoDetails) => {
-      Promise.all([
-        fetch(`/api/base64?href=${videoDetails.thumbnail}`).then((res) =>
-          res.text()
-        ),
-        fetch(`/api/base64?href=${videoDetails.channel.thumbnail}`).then(
-          (res) => res.text()
-        ),
-      ]).then(([thumbnail, channelThumbnail]) => {
-        if (cancelled) {
-          return;
-        }
+    if (cacheRef.current[videoId]) {
+      return;
+    }
 
-        setVideoDetails({
-          ...videoDetails,
-          thumbnail,
-          channel: {
-            ...videoDetails.channel,
-            thumbnail: channelThumbnail,
-          },
-        });
-      });
+    const abortController = new AbortController();
+
+    fetchVideoDetails(videoId, abortController.signal).then((videoDetails) => {
+      setCache((currentCache) => ({
+        ...currentCache,
+        [videoId]: videoDetails,
+      }));
     });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => abortController.abort("cleanup");
   }, [videoId]);
 
-  return videoDetails;
+  return videoId ? cache[videoId] ?? defaultVideoDetails : defaultVideoDetails;
 }

@@ -28,7 +28,7 @@ export function useFontsRef() {
       fontsRef.current = { robotoRegular, robotoMedium };
     });
 
-    return () => abortContoller.abort();
+    return () => abortContoller.abort("cleanup");
   }, []);
 
   return fontsRef;

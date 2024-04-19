@@ -1,9 +1,8 @@
-"use server";
 import { youtube } from "@googleapis/youtube";
 
 import * as schema from "@/lib/schema";
 
-export async function fetchVideoDetails(videoId: string) {
+async function fetchVideoDetails(videoId: string) {
   const client = youtube({
     auth: process.env.GOOGLE_API_KEY,
     version: "v3",
@@ -55,6 +54,34 @@ export async function fetchVideoDetails(videoId: string) {
         channel.snippet?.thumbnails?.high?.url ??
         channel.snippet?.thumbnails?.medium?.url ??
         channel.snippet?.thumbnails?.default?.url,
+    },
+  });
+}
+
+async function convertImageToBase64(href: string) {
+  const response = await fetch(href);
+  const buffer = await response.arrayBuffer();
+
+  const base64String = Buffer.from(buffer).toString("base64");
+  return `data:image/jpeg;base64,${base64String}`;
+}
+
+export async function GET(
+  req: Request,
+  { params }: { params: { videoId: string } }
+) {
+  const videoDetails = await fetchVideoDetails(params.videoId);
+  const [thumbnail, channelThumbnail] = await Promise.all([
+    convertImageToBase64(videoDetails.thumbnail),
+    convertImageToBase64(videoDetails.channel.thumbnail),
+  ]);
+
+  return Response.json({
+    ...videoDetails,
+    thumbnail,
+    channel: {
+      ...videoDetails.channel,
+      thumbnail: channelThumbnail,
     },
   });
 }
