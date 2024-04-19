@@ -37,7 +37,7 @@ export const videoDetails = z.object({
     }),
   views: z
     .string()
-    .default("0")
+    .default("30390")
     .transform((value) => {
       const number = Number(value);
       return isNaN(number) ? 0 : number;
