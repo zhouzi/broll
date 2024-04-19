@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import { Outfit as FontSans } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
