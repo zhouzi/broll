@@ -2,6 +2,8 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
 import { NextRequest, NextResponse } from "next/server";
 
+import { env } from "@/lib/env";
+
 const ratelimit = new Ratelimit({
   redis: kv,
   limiter: Ratelimit.slidingWindow(5, "10 s"),
@@ -12,7 +14,7 @@ export const config = {
 };
 
 export default async function middleware(request: NextRequest) {
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     return NextResponse.next();
   }
 

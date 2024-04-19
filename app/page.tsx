@@ -445,7 +445,7 @@ export default function Home() {
             href="https://x.com/BastiUi/status/1779866139880755295"
             className="transition-colors hover:text-foreground font-semibold"
           >
-            BastiUI
+            BastiUi
           </a>{" "}
           et un challenge de{" "}
           <a

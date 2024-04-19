@@ -16,6 +16,7 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@resvg/resvg-wasm": "^2.6.2",
+    "@t3-oss/env-nextjs": "^0.9.2",
     "@upstash/ratelimit": "^1.1.1",
     "@vercel/analytics": "^1.2.2",
     "@vercel/kv": "^1.0.1",

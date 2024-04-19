@@ -1,10 +1,11 @@
 import { youtube } from "@googleapis/youtube";
 
+import { env } from "@/lib/env";
 import * as schema from "@/lib/schema";
 
 async function fetchVideoDetails(videoId: string) {
   const client = youtube({
-    auth: process.env.GOOGLE_API_KEY,
+    auth: env.YOUTUBE_API_KEY,
     version: "v3",
   });
 
