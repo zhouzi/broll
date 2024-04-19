@@ -268,7 +268,7 @@ export default function Home() {
                             Afficher la progression de lecture
                           </FormLabel>
                         </FormItem>
-                        {value && (
+                        {typeof value === "number" && (
                           <FormItem>
                             <FormLabel>
                               Progression de lecture {value}%
