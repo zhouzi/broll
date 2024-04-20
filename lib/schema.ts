@@ -20,6 +20,9 @@ export const channel = z.object({
 });
 export type Channel = z.infer<typeof channel>;
 
+export const DEFAULT_VIDEO_ID = "XEO3duW1A80";
+export const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
+
 export const videoDetails = z.object({
   title: z.string().default("Je quitte mon CDI de Designer"),
   thumbnail: z

@@ -23,7 +23,9 @@ export function useVideoDetails(videoUrl: string) {
     })
   );
 
-  const [cache, setCache] = useState<Record<string, schema.VideoDetails>>({});
+  const [cache, setCache] = useState<Record<string, schema.VideoDetails>>({
+    [schema.DEFAULT_VIDEO_ID]: defaultVideoDetails,
+  });
   const cacheRef = useRef(cache);
 
   useLayoutEffect(() => {
