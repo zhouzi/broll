@@ -25,6 +25,8 @@
     "clsx": "^2.1.0",
     "color": "^4.2.3",
     "dayjs": "^1.11.10",
+    "deep-equal": "^2.2.3",
+    "deepmerge": "^4.3.1",
     "lucide-react": "^0.368.0",
     "next": "14.2.1",
     "next-themes": "^0.3.0",
@@ -39,6 +41,7 @@
   },
   "devDependencies": {
     "@types/color": "^3.0.6",
+    "@types/deep-equal": "^1.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -72,7 +72,7 @@ export const card = z.object({
 
 export const duration = z.object({
   foreground: z.string().default("#ffffff"),
-  background: z.string().default("#2a2a2a"),
+  background: z.string().default("#000000cc"),
 });
 
 export const progressBar = z.object({

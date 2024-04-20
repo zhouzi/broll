@@ -2,6 +2,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import deepEqual from "deep-equal";
+import deepMerge from "deepmerge";
 import {
   Copy,
   Download,
@@ -64,8 +66,18 @@ const formSchema = z.object({
   theme: schema.theme,
 });
 
-const defaultTheme = schema.theme.parse({
+const lightTheme = schema.theme.parse({
   card: schema.card.parse({}),
+  duration: schema.duration.parse({}),
+  progressBar: schema.progressBar.parse({}),
+  options: schema.options.parse({}),
+});
+
+const darkTheme = schema.theme.parse({
+  card: schema.card.parse({
+    foreground: "#f1f1f1",
+    background: "#0f0f0f",
+  }),
   duration: schema.duration.parse({}),
   progressBar: schema.progressBar.parse({}),
   options: schema.options.parse({}),
@@ -73,20 +85,17 @@ const defaultTheme = schema.theme.parse({
 
 interface DefaultColorTheme {
   name: string;
-  foreground: string;
-  background: string;
+  theme: schema.Theme;
 }
 
 const defaultColorThemes = {
   light: {
     name: "Clair",
-    foreground: defaultTheme.card.foreground,
-    background: defaultTheme.card.background,
+    theme: lightTheme,
   },
   dark: {
     name: "Sombre",
-    foreground: "#f1f1f1",
-    background: "#0f0f0f",
+    theme: darkTheme,
   },
 } satisfies Record<string, DefaultColorTheme>;
 
@@ -96,11 +105,30 @@ function findColorThemeByThemeId(id: string) {
     | undefined;
 }
 
+function pickColorsFromTheme(theme: schema.Theme) {
+  return {
+    card: {
+      background: theme.card.background,
+      foreground: theme.card.foreground,
+    },
+    duration: {
+      background: theme.duration.background,
+      foreground: theme.duration.foreground,
+    },
+    progressBar: {
+      background: theme.progressBar.background,
+      foreground: theme.progressBar.foreground,
+    },
+  };
+}
+
 function findColorThemeIdByTheme(theme: schema.Theme) {
   for (const [id, colorTheme] of Object.entries(defaultColorThemes)) {
     if (
-      colorTheme.foreground === theme.card.foreground &&
-      colorTheme.background === theme.card.background
+      deepEqual(
+        pickColorsFromTheme(colorTheme.theme),
+        pickColorsFromTheme(theme)
+      )
     ) {
       return id;
     }
@@ -110,7 +138,7 @@ function findColorThemeIdByTheme(theme: schema.Theme) {
 }
 
 const defaultValues = formSchema.parse({
-  theme: defaultTheme,
+  theme: lightTheme,
 });
 
 export default function Home() {
@@ -415,12 +443,13 @@ export default function Home() {
 
                         if (defaultColorTheme) {
                           form.setValue(
-                            "theme.card.foreground",
-                            defaultColorTheme.foreground
-                          );
-                          form.setValue(
-                            "theme.card.background",
-                            defaultColorTheme.background
+                            "theme",
+                            schema.theme.parse(
+                              deepMerge(
+                                theme,
+                                pickColorsFromTheme(defaultColorTheme.theme)
+                              )
+                            )
                           );
                         }
                       }}
