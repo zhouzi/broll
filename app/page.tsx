@@ -35,6 +35,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import * as schema from "@/lib/schema";
 import { RenderStatus, useRenderPNG } from "@/lib/use-render-png";
@@ -56,13 +64,53 @@ const formSchema = z.object({
   theme: schema.theme,
 });
 
-const defaultValues = formSchema.parse({
-  theme: {
-    card: schema.card.parse({}),
-    duration: schema.duration.parse({}),
-    progressBar: schema.progressBar.parse({}),
-    options: schema.options.parse({}),
+const defaultTheme = schema.theme.parse({
+  card: schema.card.parse({}),
+  duration: schema.duration.parse({}),
+  progressBar: schema.progressBar.parse({}),
+  options: schema.options.parse({}),
+});
+
+interface DefaultColorTheme {
+  name: string;
+  foreground: string;
+  background: string;
+}
+
+const defaultColorThemes = {
+  light: {
+    name: "Clair",
+    foreground: defaultTheme.card.foreground,
+    background: defaultTheme.card.background,
   },
+  dark: {
+    name: "Sombre",
+    foreground: "#f1f1f1",
+    background: "#0f0f0f",
+  },
+} satisfies Record<string, DefaultColorTheme>;
+
+function findColorThemeByThemeId(id: string) {
+  return defaultColorThemes[id as keyof typeof defaultColorThemes] as
+    | DefaultColorTheme
+    | undefined;
+}
+
+function findColorThemeIdByTheme(theme: schema.Theme) {
+  for (const [id, colorTheme] of Object.entries(defaultColorThemes)) {
+    if (
+      colorTheme.foreground === theme.card.foreground &&
+      colorTheme.background === theme.card.background
+    ) {
+      return id;
+    }
+  }
+
+  return undefined;
+}
+
+const defaultValues = formSchema.parse({
+  theme: defaultTheme,
 });
 
 export default function Home() {
@@ -93,13 +141,16 @@ export default function Home() {
   }, [form]);
 
   useEffect(() => {
-    const subscription = form.watch((values) => {
-      if (!form.formState.isDirty) {
-        return;
-      }
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-      localStorage.setItem("theme", JSON.stringify(values.theme));
+    const subscription = form.watch((values) => {
+      clearTimeout(timeoutId);
+
+      timeoutId = setTimeout(() => {
+        localStorage.setItem("theme", JSON.stringify(values.theme));
+      }, 500);
     });
+
     return () => subscription.unsubscribe();
   }, [form]);
 
@@ -353,6 +404,40 @@ export default function Home() {
                       </FormItem>
                     )}
                   />
+                  <div className="flex items-center gap-4">
+                    <Label className="flex-1">Thème</Label>
+                    <Select
+                      onValueChange={(value) => {
+                        const defaultColorTheme =
+                          findColorThemeByThemeId(value);
+
+                        if (defaultColorTheme) {
+                          form.setValue(
+                            "theme.card.foreground",
+                            defaultColorTheme.foreground
+                          );
+                          form.setValue(
+                            "theme.card.background",
+                            defaultColorTheme.background
+                          );
+                        }
+                      }}
+                      value={findColorThemeIdByTheme(theme)}
+                    >
+                      <SelectTrigger className="max-w-[160px]">
+                        <SelectValue placeholder="Personnalisé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(defaultColorThemes).map(
+                          ([id, theme]) => (
+                            <SelectItem key={id} value={id}>
+                              {theme.name}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <FormField
                     control={form.control}
                     name="theme.card.foreground"
