@@ -535,20 +535,23 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <Download className="mr-2 h-4 w-4" /> Télécharger
+                  <Download className="mr-2 size-4" /> Télécharger
                 </>
               )}
             </Button>
             <Button
-              variant="secondary"
-              size="icon"
+              variant="outline"
               onClick={copyPNG}
               disabled={renderStatus !== "idle"}
             >
               {renderStatus === "copying" ? (
-                <LoaderCircle className="size-4 animate-spin" />
+                <>
+                  <LoaderCircle className="mr-2 size-4 animate-spin" /> Copie...
+                </>
               ) : (
-                <Copy className="size-4" />
+                <>
+                  <Copy className="mr-2 size-4" /> Copier
+                </>
               )}
             </Button>
           </div>
