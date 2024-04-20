@@ -187,11 +187,23 @@ export default function Home() {
   return (
     <div className="max-w-[900px] py-6 px-4 m-auto">
       <header className="py-4 flex justify-between items-center">
-        <Link href="/" className="inline-flex items-baseline gap-[0.15rem]">
-          <span className="text-2xl font-black">broll</span>
-          <span className="inline-flex size-2 bg-red-600 rounded-full" />
-          <span className="text-muted-foreground">gabin.app</span>
-        </Link>
+        <div className="inline-flex items-baseline gap-1">
+          <Link
+            href="/"
+            className="inline-flex items-baseline gap-[0.15rem] group"
+          >
+            <span className="text-2xl font-black group-hover:underline group-hover:underline-offset-2">
+              broll
+            </span>
+            <span className="inline-flex size-2 bg-red-600 rounded-full group-hover:animate-pulse" />
+          </Link>
+          <a
+            href="https://gabin.app"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            gabin.app
+          </a>
+        </div>
         <nav>
           <ul className="flex items-center">
             {[
