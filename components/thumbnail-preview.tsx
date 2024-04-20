@@ -3,35 +3,38 @@ import Color from "color";
 
 import * as schema from "@/lib/schema";
 
-export function createScale(theme: schema.Theme, baseScale: number) {
-  function n(value: number) {
-    return value * baseScale;
+export function createScale(theme: schema.Theme, baseFactor: number) {
+  function scale(value: number) {
+    return value * baseFactor;
   }
 
-  function px(value: number) {
-    return `${n(value)}px`;
-  }
+  scale.width = scale(450);
 
-  function text(scale: number) {
-    const fontSize = n(16 * scale) * theme.card.fontSize;
-    const lineHeight = fontSize * 1.2;
+  scale.fontSize = function fontSize(factor: number) {
+    return scale(16 * factor) * theme.card.fontSize;
+  };
 
+  scale.lineHeight = function lineHeight(factor: number) {
+    return scale.fontSize(factor) * 1.2;
+  };
+
+  scale.text = function text(factor: number) {
     return {
-      fontSize: `${fontSize}px`,
-      lineHeight: `${lineHeight}px`,
+      fontSize: `${scale.fontSize(factor)}px`,
+      lineHeight: `${scale.lineHeight(factor)}px`,
       fontWeight: 500,
     };
-  }
+  };
 
-  function spacing(scale: number) {
-    return `${n(4 * scale) * theme.card.spacing}px`;
-  }
+  scale.padding = function padding(factor: number) {
+    return scale(4 * factor) * theme.card.spacing;
+  };
 
-  function borderRadius(scale: number) {
-    return `${n(6 * scale) * theme.card.borderRadius}px`;
-  }
+  scale.borderRadius = function borderRadius(factor: number) {
+    return scale(6 * factor) * theme.card.borderRadius;
+  };
 
-  return { n, px, text, spacing, borderRadius, width: n(450) };
+  return scale;
 }
 
 interface ThumbnailPreviewProps {
@@ -43,7 +46,7 @@ interface ThumbnailPreviewProps {
 export function ThumbnailPreview({
   videoDetails,
   theme,
-  scale: { px, text, spacing, borderRadius, width },
+  scale,
 }: ThumbnailPreviewProps) {
   return (
     <div
@@ -51,16 +54,16 @@ export function ThumbnailPreview({
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme.card.background,
-        padding: spacing(7.5),
-        borderRadius: borderRadius(6),
-        width: `${width}px`,
+        padding: `${scale.padding(7.5)}px`,
+        borderRadius: `${scale.borderRadius(2) + scale.padding(7.5)}px`,
+        width: `${scale.width}px`,
       }}
     >
       <div
         style={{
           display: "flex",
-          marginBottom: text(0.6).fontSize,
-          borderRadius: borderRadius(2),
+          marginBottom: `${scale.fontSize(0.6)}px`,
+          borderRadius: `${scale.borderRadius(2)}px`,
           overflow: "hidden",
           position: "relative",
         }}
@@ -70,13 +73,13 @@ export function ThumbnailPreview({
           <div
             style={{
               position: "absolute",
-              bottom: px(8),
-              right: px(8),
+              bottom: `${scale(8)}px`,
+              right: `${scale(8)}px`,
               color: theme.duration.foreground,
               backgroundColor: theme.duration.background,
-              borderRadius: borderRadius(1),
-              padding: `${text(0.1).fontSize} ${text(0.2).fontSize}`,
-              ...text(0.75),
+              borderRadius: `${scale.borderRadius(1)}px`,
+              padding: `${scale.fontSize(0.1)}px ${scale.fontSize(0.2)}px`,
+              ...scale.text(0.75),
             }}
           >
             {videoDetails.duration}
@@ -88,7 +91,7 @@ export function ThumbnailPreview({
               position: "absolute",
               bottom: "0",
               left: "0",
-              height: px(4),
+              height: `${scale(4)}px`,
               width: "100%",
               display: "flex",
               backgroundColor: theme.progressBar.background,
@@ -103,15 +106,15 @@ export function ThumbnailPreview({
           </div>
         )}
       </div>
-      <div style={{ display: "flex", gap: text(0.6).fontSize }}>
+      <div style={{ display: "flex", gap: `${scale.fontSize(0.6)}px` }}>
         {theme.options.showChannelThumbnail && (
           <img
             src={videoDetails.channel.thumbnail}
             alt=""
             style={{
               borderRadius: "100%",
-              width: text(2.6).fontSize,
-              height: text(2.6).fontSize,
+              width: `${scale.fontSize(2.6)}px`,
+              height: `${scale.fontSize(2.6)}px`,
             }}
           />
         )}
@@ -125,8 +128,8 @@ export function ThumbnailPreview({
           <div
             style={{
               color: theme.card.foreground,
-              marginBottom: text(0.35).fontSize,
-              ...text(1),
+              marginBottom: `${scale.fontSize(0.35)}px`,
+              ...scale.text(1),
             }}
           >
             {videoDetails.title}
@@ -136,7 +139,7 @@ export function ThumbnailPreview({
               style={{
                 display: "flex",
                 color: Color(theme.card.foreground).fade(0.4).toString(),
-                ...text(0.875),
+                ...scale.text(0.875),
                 fontWeight: 400,
               }}
             >
@@ -147,9 +150,9 @@ export function ThumbnailPreview({
             <div
               style={{
                 color: Color(theme.card.foreground).fade(0.4).toString(),
-                ...text(0.875),
+                ...scale.text(0.875),
                 fontWeight: 400,
-                marginTop: text(0.2).fontSize,
+                marginTop: `${scale.fontSize(0.2)}px`,
               }}
             >
               {[
