@@ -77,7 +77,7 @@ export function ThumbnailPreview({
               right: `${scale(8)}px`,
               color: theme.duration.foreground,
               backgroundColor: theme.duration.background,
-              borderRadius: `${scale.borderRadius(1)}px`,
+              borderRadius: `${scale.fontSize(0.15)}px`,
               padding: `${scale.fontSize(0.1)}px ${scale.fontSize(0.2)}px`,
               ...scale.text(0.75),
             }}
