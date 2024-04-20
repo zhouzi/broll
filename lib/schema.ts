@@ -3,32 +3,32 @@ import durationPlugin from "dayjs/plugin/duration";
 import relativeTimePlugin from "dayjs/plugin/relativeTime";
 import { z } from "zod";
 
+import defaultChannelThumbnail from "@/assets/default-channel-thumbnail.inline.jpeg";
+import defaultVideoThumbnail from "@/assets/default-video-thumbnail.inline.jpeg";
+
 import "dayjs/locale/fr";
 
 dayjs.locale("fr");
 dayjs.extend(durationPlugin);
 dayjs.extend(relativeTimePlugin);
 
+export const DEFAULT_VIDEO_ID = "XEO3duW1A80";
+
+// const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
+
+const DEFAULT_VIDEO_THUMBNAIL = defaultVideoThumbnail;
+
+const DEFAULT_CHANNEL_THUMBNAIL = defaultChannelThumbnail;
+
 export const channel = z.object({
   title: z.string().default("Basti Ui"),
-  thumbnail: z
-    .string()
-    .url()
-    .default(
-      "https://yt3.ggpht.com/ePr4Q4DVIpU8GBSk0bAkias_6GJivzuuiHQQb804UT9eNw3BbEUWNhV9dLIjIbWf7SZbLa6tYg=s800-c-k-c0x00ffffff-no-rj"
-    ),
+  thumbnail: z.string().default(DEFAULT_CHANNEL_THUMBNAIL),
 });
 export type Channel = z.infer<typeof channel>;
 
-export const DEFAULT_VIDEO_ID = "XEO3duW1A80";
-export const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
-
 export const videoDetails = z.object({
   title: z.string().default("Je quitte mon CDI de Designer"),
-  thumbnail: z
-    .string()
-    .url()
-    .default("https://i3.ytimg.com/vi/XEO3duW1A80/maxresdefault.jpg"),
+  thumbnail: z.string().default(DEFAULT_VIDEO_THUMBNAIL),
   duration: z
     .string()
     .default("PT9M27S")
