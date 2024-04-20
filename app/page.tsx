@@ -341,7 +341,7 @@ export default function Home() {
                             <Checkbox
                               checked={typeof value === "number"}
                               onCheckedChange={(checked) =>
-                                onChange(checked ? 100 : undefined)
+                                onChange(checked ? 80 : undefined)
                               }
                             />
                           </FormControl>
