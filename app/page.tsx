@@ -144,10 +144,12 @@ export default function Home() {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const subscription = form.watch((values) => {
+      const { theme } = formSchema.parse(values);
+
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
-        localStorage.setItem("theme", JSON.stringify(values.theme));
+        localStorage.setItem("theme", JSON.stringify(theme));
       }, 500);
     });
 
