@@ -1,8 +1,13 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
 import { NextRequest, NextResponse } from "next/server";
 
 import { env } from "@/lib/env";
+
+const kv = createClient({
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 const ratelimit = new Ratelimit({
   redis: kv,

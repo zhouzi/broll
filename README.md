@@ -14,6 +14,6 @@ Elle fait suite à une demande de [BastiUi](https://x.com/BastiUi/status/1779866
 ## Déploiement
 
 1. [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzhouzi%2Fbroll&env=YOUTUBE_API_KEY)
-2. Ajouter les variables d'environnement en suivant les instructions d'installation (sauf celles ajoutées automatiquement par Vercel)
+2. Ajouter les variables d'environnement en suivant les instructions d'installation
 3. Activer les analytics sur Vercel (optionnel)
-4. Créer et attacher un KV store sur Vercel
+4. Créer une instance Redis sur Upstash et mettre à jour les variables d'environnement
