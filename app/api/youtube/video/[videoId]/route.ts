@@ -105,10 +105,7 @@ export async function GET(
 ) {
   const ip =
     request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
-  const { success, ...props } = await ratelimit.limit(ip);
-
-  // eslint-disable-next-line no-console
-  console.log({ reqIp: request.ip, ip, success, ...props });
+  const { success } = await ratelimit.limit(ip);
 
   if (!success) {
     return new Response("rate limit exceeded", { status: 429 });
