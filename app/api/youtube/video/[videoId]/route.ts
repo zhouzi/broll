@@ -1,4 +1,7 @@
 import { youtube } from "@googleapis/youtube";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "ioredis";
+import { NextRequest } from "next/server";
 
 import { env } from "@/lib/env";
 import * as schema from "@/lib/schema";
@@ -67,10 +70,49 @@ async function convertImageToBase64(href: string) {
   return `data:image/jpeg;base64,${base64String}`;
 }
 
+const client = new Redis(env.REDIS_PORT, env.REDIS_HOST, {
+  password: env.REDIS_PASSWORD,
+});
+
+const ratelimit = new Ratelimit({
+  redis: {
+    sadd: <TData>(key: string, ...members: TData[]) =>
+      client.sadd(key, ...members.map((m) => String(m))),
+    hset: <TValue>(
+      key: string,
+      obj: {
+        [key: string]: TValue;
+      }
+    ) => client.hset(key, obj),
+    eval: async <TArgs extends unknown[], TData = unknown>(
+      script: string,
+      keys: string[],
+      args: TArgs
+    ) =>
+      client.eval(
+        script,
+        keys.length,
+        ...keys,
+        ...(args ?? []).map((a) => String(a))
+      ) as Promise<TData>,
+  },
+  limiter: Ratelimit.slidingWindow(5, "10 s"),
+});
+
 export async function GET(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { videoId: string } }
 ) {
+  const ip = request.ip ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(ip);
+
+  // eslint-disable-next-line no-console
+  console.log({ reqIp: request.ip, ip });
+
+  if (!success) {
+    return new Response("rate limit exceeded", { status: 429 });
+  }
+
   const videoDetails = await fetchVideoDetails(params.videoId);
   const [thumbnail, channelThumbnail] = await Promise.all([
     convertImageToBase64(videoDetails.thumbnail),
