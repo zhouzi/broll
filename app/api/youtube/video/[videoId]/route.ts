@@ -103,11 +103,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { videoId: string } }
 ) {
-  const ip = request.ip ?? "127.0.0.1";
-  const { success } = await ratelimit.limit(ip);
+  const ip =
+    request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
+  const { success, ...props } = await ratelimit.limit(ip);
 
   // eslint-disable-next-line no-console
-  console.log({ reqIp: request.ip, ip });
+  console.log({ reqIp: request.ip, ip, success, ...props });
 
   if (!success) {
     return new Response("rate limit exceeded", { status: 429 });
