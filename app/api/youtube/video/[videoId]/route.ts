@@ -70,7 +70,7 @@ async function convertImageToBase64(href: string) {
   return `data:image/jpeg;base64,${base64String}`;
 }
 
-const client = new Redis(env.REDIS_PORT, env.REDIS_HOST, {
+const client = new Redis(env.REDIS_PORT_NUMBER, env.REDIS_HOST, {
   password: env.REDIS_PASSWORD,
 });
 

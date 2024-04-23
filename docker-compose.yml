@@ -1,7 +1,12 @@
 services:
   redis:
-    image: bitnami/redis:latest
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+    image: bitnami/redis:7.2.4
     ports:
       - "6379:6379"
+    env_file:
+      - .env.local
+    volumes:
+      - redis-broll-volume:/bitnami/redis/data
+
+volumes:
+  redis-broll-volume:
