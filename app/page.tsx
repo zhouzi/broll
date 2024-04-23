@@ -148,14 +148,35 @@ export default function Home() {
     defaultValues,
   });
 
-  const videoDetails = useVideoDetails(form.watch("videoUrl"));
-  const theme = form.watch("theme");
+  const [validValues, setValidValues] = useState(() => ({
+    videoId: schema.getVideoId(form.getValues("videoUrl"))!,
+    theme: form.getValues("theme"),
+  }));
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      setValidValues((currentValidValues) => {
+        const videoId = values.videoUrl
+          ? schema.getVideoId(values.videoUrl)
+          : undefined;
+        const parsedTheme = schema.theme.safeParse(values.theme);
+        return {
+          videoId: videoId ?? currentValidValues.videoId,
+          theme: parsedTheme.success
+            ? parsedTheme.data
+            : currentValidValues.theme,
+        };
+      });
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  const videoDetails = useVideoDetails(validValues.videoId);
 
   const [renderStatus, setRenderStatus] = useState<RenderStatus>("idle");
 
   const { downloadPNG, copyPNG } = useRenderPNG({
     videoDetails,
-    theme,
+    theme: validValues.theme,
     setRenderStatus,
   });
 
@@ -172,12 +193,16 @@ export default function Home() {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const subscription = form.watch((values) => {
-      const { theme } = formSchema.parse(values);
+      const parsedValues = formSchema.safeParse(values);
+
+      if (!parsedValues.success) {
+        return;
+      }
 
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
-        localStorage.setItem("theme", JSON.stringify(theme));
+        localStorage.setItem("theme", JSON.stringify(parsedValues.data.theme));
       }, 500);
     });
 
@@ -534,8 +559,8 @@ export default function Home() {
           <div className={roboto.className}>
             <YouTubeVideoCard
               videoDetails={videoDetails}
-              theme={theme}
-              scale={createScale(theme, 1)}
+              theme={validValues.theme}
+              scale={createScale(validValues.theme, 1)}
             />
           </div>
           <div className="flex gap-2">

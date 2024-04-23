@@ -7,7 +7,7 @@ const defaultVideoDetails = schema.videoDetails.parse({
   channel: {},
 });
 
-export function useVideoDetails(videoUrl: string) {
+export function useVideoDetails(videoId: string) {
   const [cache, setCache] = useState<Record<string, schema.VideoDetails>>({
     [schema.DEFAULT_VIDEO_ID]: defaultVideoDetails,
   });
@@ -17,13 +17,7 @@ export function useVideoDetails(videoUrl: string) {
     cacheRef.current = cache;
   }, [cache]);
 
-  const videoId = schema.getVideoId(videoUrl);
-
   useEffect(() => {
-    if (videoId == null) {
-      return;
-    }
-
     if (cacheRef.current[videoId]) {
       return;
     }
@@ -46,5 +40,5 @@ export function useVideoDetails(videoUrl: string) {
     return () => abortController.abort("cleanup");
   }, [videoId]);
 
-  return videoId ? cache[videoId] ?? defaultVideoDetails : defaultVideoDetails;
+  return cache[videoId] ?? defaultVideoDetails;
 }
