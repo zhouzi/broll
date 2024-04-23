@@ -1,6 +1,6 @@
 import satori from "satori";
 
-import { ThumbnailPreview, createScale } from "@/components/thumbnail-preview";
+import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 
 import { Fonts } from "./use-fonts-ref";
@@ -57,7 +57,7 @@ export async function renderPNG({
   const scale = createScale(theme, 6);
 
   const svg = await satori(
-    <ThumbnailPreview
+    <YouTubeVideoCard
       videoDetails={videoDetails}
       theme={theme}
       scale={scale}

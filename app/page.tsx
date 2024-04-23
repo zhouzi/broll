@@ -18,7 +18,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { ThumbnailPreview, createScale } from "@/components/thumbnail-preview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -46,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 import { RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
@@ -532,7 +532,7 @@ export default function Home() {
           }}
         >
           <div className={roboto.className}>
-            <ThumbnailPreview
+            <YouTubeVideoCard
               videoDetails={videoDetails}
               theme={theme}
               scale={createScale(theme, 1)}

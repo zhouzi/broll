@@ -37,17 +37,17 @@ export function createScale(theme: schema.Theme, baseFactor: number) {
   return scale;
 }
 
-interface ThumbnailPreviewProps {
+interface YouTubeVideoCardProps {
   videoDetails: schema.VideoDetails;
   theme: schema.Theme;
   scale: ReturnType<typeof createScale>;
 }
 
-export function ThumbnailPreview({
+export function YouTubeVideoCard({
   videoDetails,
   theme,
   scale,
-}: ThumbnailPreviewProps) {
+}: YouTubeVideoCardProps) {
   return (
     <div
       style={{
