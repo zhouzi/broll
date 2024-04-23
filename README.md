@@ -9,7 +9,7 @@ Elle fait suite à une demande de [BastiUi](https://x.com/BastiUi/status/1779866
 ## Installation
 
 1. `npm install`
-2. Créer le fichier `.env.local` en se basant sur le `.env.example`
+2. Créer le fichier `.env` en se basant sur le `.env.example`
 
 ## Déploiement
 

@@ -2,7 +2,10 @@ import { Analytics } from "@vercel/analytics/react";
 import { Outfit as FontSans } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
+import { getServerAuthSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+
+import { NextAuthProvider } from "./next-auth-provider";
 
 import type { Metadata } from "next";
 
@@ -19,11 +22,12 @@ export const metadata: Metadata = {
     "Éditeur de vignette personnalisée YouTube pour incrustation en b-roll, illustration réseaux sociaux, et autres.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerAuthSession();
   return (
     <html lang="fr">
       <body
@@ -32,9 +36,11 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        {children}
-        <Toaster />
-        <Analytics />
+        <NextAuthProvider session={session}>
+          {children}
+          <Toaster />
+          <Analytics />
+        </NextAuthProvider>
       </body>
     </html>
   );
