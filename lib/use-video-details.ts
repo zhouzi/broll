@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import * as schema from "@/lib/schema";
 
@@ -12,6 +13,8 @@ export function useVideoDetails(videoId: string) {
     [schema.DEFAULT_VIDEO_ID]: defaultVideoDetails,
   });
   const cacheRef = useRef(cache);
+
+  const previousVideoIdRef = useRef<string | undefined>(undefined);
 
   useLayoutEffect(() => {
     cacheRef.current = cache;
@@ -28,17 +31,35 @@ export function useVideoDetails(videoId: string) {
       signal: abortController.signal,
     }).then((res) => {
       if (res.ok) {
-        res.json().then((videoDetails) => {
+        return res.json().then((videoDetails) => {
+          previousVideoIdRef.current = videoId;
           setCache((currentCache) => ({
             ...currentCache,
             [videoId]: videoDetails,
           }));
         });
       }
+
+      toast.error(
+        "Une erreur est survenue lors de la récupération des informations de la vidéo"
+      );
     });
 
     return () => abortController.abort("cleanup");
   }, [videoId]);
 
-  return cache[videoId] ?? defaultVideoDetails;
+  const cachedVideoDetails = cache[videoId];
+
+  return useMemo(() => {
+    const previousVideoId = previousVideoIdRef.current;
+    const previousCachedVideoDetails = previousVideoId
+      ? cacheRef.current[previousVideoId]
+      : undefined;
+
+    return {
+      loading: cachedVideoDetails == null,
+      videoDetails:
+        cachedVideoDetails ?? previousCachedVideoDetails ?? defaultVideoDetails,
+    };
+  }, [cachedVideoDetails]);
 }

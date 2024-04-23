@@ -170,7 +170,9 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  const videoDetails = useVideoDetails(validValues.videoId);
+  const { loading: loadingVideoDetails, videoDetails } = useVideoDetails(
+    validValues.videoId
+  );
 
   const [renderStatus, setRenderStatus] = useState<RenderStatus>("idle");
 
@@ -274,10 +276,20 @@ export default function Home() {
                       <FormItem>
                         <FormLabel>URL de la vidéo</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="https://www.youtube.com/watch?v=XEO3duW1A80"
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Input
+                              placeholder="https://www.youtube.com/watch?v=XEO3duW1A80"
+                              {...field}
+                            />
+                            {loadingVideoDetails && (
+                              <span className="absolute right-[1px] top-1/2 -translate-y-1/2 p-2 bg-background">
+                                <LoaderCircle
+                                  className="animate-spin"
+                                  size={16}
+                                />
+                              </span>
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
