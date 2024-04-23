@@ -148,7 +148,8 @@ export default function Home() {
     defaultValues,
   });
 
-  const videoDetails = useVideoDetails(form.watch("videoUrl"));
+  const videoUrl = form.watch("videoUrl");
+  const videoDetails = useVideoDetails(videoUrl);
   const theme = form.watch("theme");
 
   const [renderStatus, setRenderStatus] = useState<RenderStatus>("idle");
@@ -446,41 +447,47 @@ export default function Home() {
                       </FormItem>
                     )}
                   />
-                  <div className="flex items-center gap-4">
-                    <Label className="flex-1">Thème</Label>
-                    <Select
-                      onValueChange={(value) => {
-                        const defaultColorTheme =
-                          findColorThemeByThemeId(value);
+                  <FormField
+                    control={form.control}
+                    name="theme"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-4">
+                        <Label className="flex-1">Thème</Label>
+                        <Select
+                          onValueChange={(value) => {
+                            const defaultColorTheme =
+                              findColorThemeByThemeId(value);
 
-                        if (defaultColorTheme) {
-                          form.setValue(
-                            "theme",
-                            schema.theme.parse(
-                              deepMerge(
-                                theme,
-                                pickColorsFromTheme(defaultColorTheme.theme)
+                            if (defaultColorTheme) {
+                              form.setValue(
+                                "theme",
+                                schema.theme.parse(
+                                  deepMerge(
+                                    field.value,
+                                    pickColorsFromTheme(defaultColorTheme.theme)
+                                  )
+                                )
+                              );
+                            }
+                          }}
+                          value={findColorThemeIdByTheme(field.value)}
+                        >
+                          <SelectTrigger className="max-w-[160px]">
+                            <SelectValue placeholder="Personnalisé" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(defaultColorThemes).map(
+                              ([id, theme]) => (
+                                <SelectItem key={id} value={id}>
+                                  {theme.name}
+                                </SelectItem>
                               )
-                            )
-                          );
-                        }
-                      }}
-                      value={findColorThemeIdByTheme(theme)}
-                    >
-                      <SelectTrigger className="max-w-[160px]">
-                        <SelectValue placeholder="Personnalisé" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(defaultColorThemes).map(
-                          ([id, theme]) => (
-                            <SelectItem key={id} value={id}>
-                              {theme.name}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="theme.card.foreground"
