@@ -3,7 +3,10 @@ import satori from "satori";
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 
-import { Fonts } from "./use-fonts-ref";
+export interface Fonts {
+  robotoRegular: ArrayBuffer;
+  robotoMedium: ArrayBuffer;
+}
 
 interface MessageData {
   _id: number;

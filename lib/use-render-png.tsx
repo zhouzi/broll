@@ -10,8 +10,7 @@ import { toast } from "sonner";
 
 import * as schema from "@/lib/schema";
 
-import { renderPNG } from "./render-png";
-import { useFontsRef } from "./use-fonts-ref";
+import { renderPNG, Fonts } from "./render-png";
 
 export type RenderStatus = "idle" | "downloading" | "copying";
 
@@ -33,7 +32,29 @@ export function useRenderPNG({
     setRenderStatusRef.current = props.setRenderStatus;
   }, [props.setRenderStatus]);
 
-  const fontsRef = useFontsRef();
+  const fontsRef = useRef<Fonts | undefined>(undefined);
+
+  useEffect(() => {
+    const abortContoller = new AbortController();
+
+    Promise.all([
+      fetch("/fonts/Roboto-Regular.ttf", {
+        signal: abortContoller.signal,
+      }).then((res) => res.arrayBuffer()),
+      fetch("/fonts/Roboto-Medium.ttf", { signal: abortContoller.signal }).then(
+        (res) => res.arrayBuffer()
+      ),
+    ]).then(([robotoRegular, robotoMedium]) => {
+      if (abortContoller.signal.aborted) {
+        return;
+      }
+
+      fontsRef.current = { robotoRegular, robotoMedium };
+    });
+
+    return () => abortContoller.abort("cleanup");
+  }, []);
+
   const downloadPNGRef = useRef(
     () => new Promise((resolve, reject) => reject("not ready"))
   );
