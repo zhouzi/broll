@@ -458,14 +458,14 @@ export default function Home() {
                             "theme",
                             schema.theme.parse(
                               deepMerge(
-                                theme,
+                                form.getValues("theme"),
                                 pickColorsFromTheme(defaultColorTheme.theme)
                               )
                             )
                           );
                         }
                       }}
-                      value={findColorThemeIdByTheme(theme)}
+                      value={findColorThemeIdByTheme(form.getValues("theme"))}
                     >
                       <SelectTrigger className="max-w-[160px]">
                         <SelectValue placeholder="Personnalisé" />
