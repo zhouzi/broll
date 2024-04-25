@@ -93,7 +93,7 @@ export async function renderPNG({
           const hex = segment.codePointAt(0)?.toString(16);
           if (hex) {
             const res = await fetch(
-              `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${hex}.svg`
+              `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${hex}.svg`,
             );
 
             if (res.ok) {
@@ -114,7 +114,7 @@ export async function renderPNG({
 
         return segment;
       },
-    }
+    },
   );
   const messageData = (await convertSVGToPNG?.({
     svg,

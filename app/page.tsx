@@ -198,9 +198,9 @@ export default function Home() {
     const parsers = [
       () =>
         queryTypes.parseObject(
-          queryString.parse(window.location.search.slice(1))
+          queryString.parse(window.location.search.slice(1)),
         ),
-      () => JSON.parse(localStorage.getItem("theme") ?? "{}"),
+      () => JSON.parse(localStorage.getItem("theme") ?? "{}") as unknown,
     ];
     for (const parse of parsers) {
       try {
@@ -233,8 +233,8 @@ export default function Home() {
           undefined,
           "",
           `${location.pathname}?${queryString.stringify(
-            parsedValues.data.theme
-          )}`
+            parsedValues.data.theme,
+          )}`,
         );
         localStorage.setItem("theme", JSON.stringify(parsedValues.data.theme));
       }, 500);
