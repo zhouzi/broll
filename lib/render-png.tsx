@@ -1,5 +1,4 @@
 import satori from "satori";
-import twemoji from "twemoji";
 
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";

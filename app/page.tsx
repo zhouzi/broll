@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
+import queryString from "qs";
+import * as queryTypes from "query-types";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -183,12 +185,23 @@ export default function Home() {
   });
 
   useEffect(() => {
-    try {
-      const localTheme = schema.theme.parse(
-        JSON.parse(localStorage.getItem("theme") ?? "{}")
-      );
-      form.setValue("theme", localTheme, { shouldDirty: true });
-    } catch (err) {}
+    const parsers = [
+      () =>
+        queryTypes.parseObject(
+          queryString.parse(window.location.search.slice(1))
+        ),
+      () => JSON.parse(localStorage.getItem("theme") ?? "{}"),
+    ];
+    for (const parse of parsers) {
+      try {
+        const parsedTheme = schema.theme.safeParse(parse());
+
+        if (parsedTheme.success) {
+          form.setValue("theme", parsedTheme.data, { shouldDirty: true });
+          return;
+        }
+      } catch (err) {}
+    }
   }, [form]);
 
   useEffect(() => {
@@ -204,6 +217,15 @@ export default function Home() {
       clearTimeout(timeoutId);
 
       timeoutId = setTimeout(() => {
+        // Using the native history is the documented way of preventing rerenders:
+        // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#windowhistoryreplacestate
+        window.history.replaceState(
+          undefined,
+          "",
+          `${location.pathname}?${queryString.stringify(
+            parsedValues.data.theme
+          )}`
+        );
         localStorage.setItem("theme", JSON.stringify(parsedValues.data.theme));
       }, 500);
     });
