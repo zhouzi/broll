@@ -1,7 +1,7 @@
 import { youtube } from "@googleapis/youtube";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "ioredis";
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 
 import { env } from "@/lib/env";
 import * as schema from "@/lib/schema";
@@ -78,22 +78,18 @@ const ratelimit = new Ratelimit({
   redis: {
     sadd: <TData>(key: string, ...members: TData[]) =>
       client.sadd(key, ...members.map((m) => String(m))),
-    hset: <TValue>(
-      key: string,
-      obj: {
-        [key: string]: TValue;
-      }
-    ) => client.hset(key, obj),
+    hset: <TValue>(key: string, obj: Record<string, TValue>) =>
+      client.hset(key, obj),
     eval: async <TArgs extends unknown[], TData = unknown>(
       script: string,
       keys: string[],
-      args: TArgs
+      args: TArgs,
     ) =>
       client.eval(
         script,
         keys.length,
         ...keys,
-        ...(args ?? []).map((a) => String(a))
+        ...(args ?? []).map((a) => String(a)),
       ) as Promise<TData>,
   },
   limiter: Ratelimit.slidingWindow(5, "10 s"),
@@ -101,7 +97,7 @@ const ratelimit = new Ratelimit({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: { videoId: string } },
 ) {
   const ip =
     request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";

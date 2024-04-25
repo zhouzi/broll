@@ -57,7 +57,7 @@ import { Slider } from "@/components/ui/slider";
 import { UserAvatar } from "@/components/user-avatar";
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
-import { RenderStatus, useRenderPNG } from "@/lib/use-render-png";
+import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
 
 const roboto = Roboto({
@@ -137,7 +137,7 @@ function findColorThemeIdByTheme(theme: schema.Theme) {
     if (
       deepEqual(
         pickColorsFromTheme(colorTheme.theme),
-        pickColorsFromTheme(theme)
+        pickColorsFromTheme(theme),
       )
     ) {
       return id;
@@ -183,7 +183,7 @@ export default function Home() {
   }, [form]);
 
   const { loading: loadingVideoDetails, videoDetails } = useVideoDetails(
-    validValues.videoId
+    validValues.videoId,
   );
 
   const [renderStatus, setRenderStatus] = useState<RenderStatus>("idle");
@@ -244,17 +244,17 @@ export default function Home() {
   }, [form]);
 
   return (
-    <div className="max-w-[900px] py-6 px-4 m-auto">
-      <header className="py-4 flex justify-between items-center">
+    <div className="m-auto max-w-[900px] px-4 py-6">
+      <header className="flex items-center justify-between py-4">
         <div className="inline-flex items-baseline gap-1">
           <Link
             href="/"
-            className="inline-flex items-baseline gap-[0.15rem] group"
+            className="group inline-flex items-baseline gap-[0.15rem]"
           >
             <span className="text-2xl font-black group-hover:underline group-hover:underline-offset-2">
               broll
             </span>
-            <span className="inline-flex size-2 bg-red-600 rounded-full group-hover:animate-pulse" />
+            <span className="inline-flex size-2 rounded-full bg-red-600 group-hover:animate-pulse" />
           </Link>
           <a
             href="https://gabin.app"
@@ -291,7 +291,7 @@ export default function Home() {
           )}
         </div>
       </header>
-      <main className="flex flex-col-reverse md:flex-row gap-8">
+      <main className="flex flex-col-reverse gap-8 md:flex-row">
         <div className="flex-1">
           <Card>
             <CardHeader>
@@ -314,7 +314,7 @@ export default function Home() {
                               {...field}
                             />
                             {loadingVideoDetails && (
-                              <span className="absolute right-[1px] top-1/2 -translate-y-1/2 p-2 bg-background">
+                              <span className="absolute right-[1px] top-1/2 -translate-y-1/2 bg-background p-2">
                                 <LoaderCircle
                                   className="animate-spin"
                                   size={16}
@@ -528,9 +528,9 @@ export default function Home() {
                             schema.theme.parse(
                               deepMerge(
                                 form.getValues("theme"),
-                                pickColorsFromTheme(defaultColorTheme.theme)
-                              )
-                            )
+                                pickColorsFromTheme(defaultColorTheme.theme),
+                              ),
+                            ),
                           );
                         }
                       }}
@@ -545,7 +545,7 @@ export default function Home() {
                             <SelectItem key={id} value={id}>
                               {theme.name}
                             </SelectItem>
-                          )
+                          ),
                         )}
                       </SelectContent>
                     </Select>
@@ -554,7 +554,7 @@ export default function Home() {
                     control={form.control}
                     name="theme.card.foreground"
                     render={({ field }) => (
-                      <FormItem className="space-y-0 flex items-center">
+                      <FormItem className="flex items-center space-y-0">
                         <FormLabel className="flex-1">Texte</FormLabel>
                         <FormControl className="w-16">
                           <Input
@@ -571,7 +571,7 @@ export default function Home() {
                     control={form.control}
                     name="theme.card.background"
                     render={({ field }) => (
-                      <FormItem className="space-y-0 flex items-center">
+                      <FormItem className="flex items-center space-y-0">
                         <FormLabel className="flex-1">Arrière plan</FormLabel>
                         <FormControl className="w-16">
                           <Input
@@ -590,7 +590,7 @@ export default function Home() {
           </Card>
         </div>
         <div
-          className="py-8 px-4 flex flex-col gap-4 items-center justify-center relative"
+          className="relative flex flex-col items-center justify-center gap-4 px-4 py-8"
           style={{
             // Source: https://sharkcoder.com/images/background
             background: "#eee",
@@ -638,26 +638,26 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <footer className="py-8 flex justify-between items-center">
+      <footer className="flex items-center justify-between py-8">
         <p className="text-sm text-muted-foreground">
           D'après une demande de{" "}
           <a
             href="https://x.com/BastiUi/status/1779866139880755295"
-            className="transition-colors hover:text-foreground font-semibold"
+            className="font-semibold transition-colors hover:text-foreground"
           >
             BastiUi
           </a>{" "}
           et un challenge de{" "}
           <a
             href="https://x.com/benjamincode/status/1779876164296937928"
-            className="transition-colors hover:text-foreground font-semibold"
+            className="font-semibold transition-colors hover:text-foreground"
           >
             BenjaminCode
           </a>{" "}
           -{" "}
           <a
             href="https://github.com/zhouzi/broll"
-            className="transition-colors hover:text-foreground font-semibold"
+            className="font-semibold transition-colors hover:text-foreground"
           >
             Code source
           </a>

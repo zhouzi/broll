@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Color from "color";
 
-import * as schema from "@/lib/schema";
+import type * as schema from "@/lib/schema";
 
 export function createScale(theme: schema.Theme, baseFactor: number) {
   function scale(value: number) {

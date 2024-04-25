@@ -1,5 +1,5 @@
-import { DefaultSession } from "next-auth";
-import { ComponentProps } from "react";
+import { type DefaultSession } from "next-auth";
+import { type ComponentProps } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 

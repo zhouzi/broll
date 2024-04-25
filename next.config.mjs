@@ -4,7 +4,7 @@ const nextConfig = {
     // Import images as base64 when suffixed with .inline
     // Useful for the default image
     const imageLoaderRule = config.module.rules.find(
-      (rule) => rule.loader === "next-image-loader"
+      (rule) => rule.loader === "next-image-loader",
     );
     imageLoaderRule.exclude = /\.inline\.(png|jpg|jpeg|svg)$/i;
     config.module.rules.push({

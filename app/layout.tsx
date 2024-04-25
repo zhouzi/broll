@@ -33,7 +33,7 @@ export default async function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-muted/40 font-sans antialiased",
-          fontSans.variable
+          fontSans.variable,
         )}
       >
         <NextAuthProvider session={session}>

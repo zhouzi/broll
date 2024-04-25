@@ -27,11 +27,11 @@ export function useVideoDetails(videoId: string) {
 
     const abortController = new AbortController();
 
-    fetch(`/api/youtube/video/${videoId}`, {
+    void fetch(`/api/youtube/video/${videoId}`, {
       signal: abortController.signal,
     }).then((res) => {
       if (res.ok) {
-        return res.json().then((videoDetails) => {
+        return res.json().then((videoDetails: schema.VideoDetails) => {
           previousVideoIdRef.current = videoId;
           setCache((currentCache) => ({
             ...currentCache,
@@ -41,7 +41,7 @@ export function useVideoDetails(videoId: string) {
       }
 
       toast.error(
-        "Une erreur est survenue lors de la récupération des informations de la vidéo"
+        "Une erreur est survenue lors de la récupération des informations de la vidéo",
       );
     });
 
