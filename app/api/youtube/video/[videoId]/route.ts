@@ -1,43 +1,18 @@
-import { youtube } from "@googleapis/youtube";
-
-import { env } from "@/lib/env";
 import * as schema from "@/lib/schema";
+import { getChannelById, getVideoById } from "@/lib/youtube-client";
 
 async function fetchVideoDetails(videoId: string) {
-  const client = youtube({
-    auth: env.YOUTUBE_API_KEY,
-    version: "v3",
-  });
+  const video = await getVideoById(videoId);
 
-  const {
-    data: { items: videos },
-  } = await client.videos.list({
-    id: [videoId],
-    part: ["snippet", "statistics", "contentDetails"],
-  });
-
-  if (videos == null || videos.length === 0) {
-    throw new Error("not found");
+  if (video?.snippet?.channelId == null) {
+    return undefined;
   }
 
-  const [video] = videos;
+  const channel = await getChannelById(video.snippet.channelId);
 
-  if (video.snippet?.channelId == null) {
-    throw new Error("not found");
+  if (channel == null) {
+    return undefined;
   }
-
-  const {
-    data: { items: channels },
-  } = await client.channels.list({
-    id: [video.snippet.channelId],
-    part: ["snippet"],
-  });
-
-  if (channels == null) {
-    throw new Error("not found");
-  }
-
-  const [channel] = channels;
 
   return schema.videoDetails.parse({
     title: video.snippet?.title,
@@ -72,6 +47,11 @@ export async function GET(
   { params }: { params: { videoId: string } }
 ) {
   const videoDetails = await fetchVideoDetails(params.videoId);
+
+  if (videoDetails == null) {
+    return Response.json({ error: "Video not found" }, { status: 404 });
+  }
+
   const [thumbnail, channelThumbnail] = await Promise.all([
     convertImageToBase64(videoDetails.thumbnail),
     convertImageToBase64(videoDetails.channel.thumbnail),
