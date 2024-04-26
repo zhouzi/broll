@@ -25,11 +25,16 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
   },
-  client: {},
+  client: {
+    NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT: z.string().url(),
+  },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
 
     YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
+
+    NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT:
+      process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT,
 
     REDIS_HOST: process.env.REDIS_HOST,
     REDIS_PORT_NUMBER: process.env.REDIS_PORT_NUMBER,

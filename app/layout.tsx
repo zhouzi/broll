@@ -1,5 +1,6 @@
 import { Analytics } from "@vercel/analytics/react";
 import { Outfit as FontSans } from "next/font/google";
+import { AxiomWebVitals } from "next-axiom";
 
 import { Toaster } from "@/components/ui/sonner";
 import { getServerAuthSession } from "@/lib/auth";
@@ -30,6 +31,9 @@ export default async function RootLayout({
   const session = await getServerAuthSession();
   return (
     <html lang="fr">
+      <head>
+        <AxiomWebVitals />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-muted/40 font-sans antialiased",

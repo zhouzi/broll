@@ -1,48 +1,46 @@
-import { youtube } from "@googleapis/youtube";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "ioredis";
 import { type NextRequest } from "next/server";
+import { withAxiom } from "next-axiom";
 
-import { env } from "@/lib/env";
+import { ratelimit } from "@/lib/redis";
 import * as schema from "@/lib/schema";
+import { getChannelById, getVideoById } from "@/lib/youtube-client";
 
-async function fetchVideoDetails(videoId: string) {
-  const client = youtube({
-    auth: env.YOUTUBE_API_KEY,
-    version: "v3",
-  });
+async function convertImageToBase64(href: string) {
+  const response = await fetch(href);
+  const buffer = await response.arrayBuffer();
 
-  const {
-    data: { items: videos },
-  } = await client.videos.list({
-    id: [videoId],
-    part: ["snippet", "statistics", "contentDetails"],
-  });
+  const base64String = Buffer.from(buffer).toString("base64");
+  return `data:image/jpeg;base64,${base64String}`;
+}
 
-  if (videos == null || videos.length === 0) {
-    throw new Error("not found");
+export const GET = withAxiom(async function GET(
+  request: NextRequest,
+  { params: { videoId } }: { params: { videoId: string } },
+) {
+  const ip =
+    request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
+
+  const { success } = await ratelimit.abuse.limit(ip);
+  if (!success) {
+    return Response.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
 
-  const [video] = videos;
+  const video = await getVideoById({ ip, videoId });
 
-  if (video.snippet?.channelId == null) {
-    throw new Error("not found");
+  if (video?.snippet?.channelId == null) {
+    return Response.json({ error: "Video not found" }, { status: 404 });
   }
 
-  const {
-    data: { items: channels },
-  } = await client.channels.list({
-    id: [video.snippet.channelId],
-    part: ["snippet"],
+  const channel = await getChannelById({
+    ip,
+    channelId: video.snippet.channelId,
   });
 
-  if (channels == null) {
-    throw new Error("not found");
+  if (channel == null) {
+    return Response.json({ error: "Channel not found" }, { status: 404 });
   }
 
-  const [channel] = channels;
-
-  return schema.videoDetails.parse({
+  const videoDetails = schema.videoDetails.parse({
     title: video.snippet?.title,
     thumbnail:
       video.snippet?.thumbnails?.maxres?.url ??
@@ -60,54 +58,7 @@ async function fetchVideoDetails(videoId: string) {
         channel.snippet?.thumbnails?.default?.url,
     },
   });
-}
 
-async function convertImageToBase64(href: string) {
-  const response = await fetch(href);
-  const buffer = await response.arrayBuffer();
-
-  const base64String = Buffer.from(buffer).toString("base64");
-  return `data:image/jpeg;base64,${base64String}`;
-}
-
-const client = new Redis(env.REDIS_PORT_NUMBER, env.REDIS_HOST, {
-  password: env.REDIS_PASSWORD,
-});
-
-const ratelimit = new Ratelimit({
-  redis: {
-    sadd: <TData>(key: string, ...members: TData[]) =>
-      client.sadd(key, ...members.map((m) => String(m))),
-    hset: <TValue>(key: string, obj: Record<string, TValue>) =>
-      client.hset(key, obj),
-    eval: async <TArgs extends unknown[], TData = unknown>(
-      script: string,
-      keys: string[],
-      args: TArgs,
-    ) =>
-      client.eval(
-        script,
-        keys.length,
-        ...keys,
-        ...(args ?? []).map((a) => String(a)),
-      ) as Promise<TData>,
-  },
-  limiter: Ratelimit.slidingWindow(5, "10 s"),
-});
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { videoId: string } },
-) {
-  const ip =
-    request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return new Response("rate limit exceeded", { status: 429 });
-  }
-
-  const videoDetails = await fetchVideoDetails(params.videoId);
   const [thumbnail, channelThumbnail] = await Promise.all([
     convertImageToBase64(videoDetails.thumbnail),
     convertImageToBase64(videoDetails.channel.thumbnail),
@@ -121,4 +72,4 @@ export async function GET(
       thumbnail: channelThumbnail,
     },
   });
-}
+});
