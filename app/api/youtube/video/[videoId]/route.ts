@@ -1,20 +1,44 @@
-import * as schema from "@/lib/schema";
-import { getChannelById, getVideoById } from "@/lib/youtube-client";
+import { NextRequest } from "next/server";
 
-async function fetchVideoDetails(videoId: string) {
-  const video = await getVideoById(videoId);
+import * as schema from "@/lib/schema";
+import { getChannelById, getVideoById, ratelimit } from "@/lib/youtube-client";
+
+async function convertImageToBase64(href: string) {
+  const response = await fetch(href);
+  const buffer = await response.arrayBuffer();
+
+  const base64String = Buffer.from(buffer).toString("base64");
+  return `data:image/jpeg;base64,${base64String}`;
+}
+
+export async function GET(
+  request: NextRequest,
+  { params: { videoId } }: { params: { videoId: string } }
+) {
+  const ip =
+    request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
+
+  const { success } = await ratelimit.abuse.limit(ip);
+  if (!success) {
+    return Response.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
+
+  const video = await getVideoById({ ip, videoId });
 
   if (video?.snippet?.channelId == null) {
-    return undefined;
+    return Response.json({ error: "Video not found" }, { status: 404 });
   }
 
-  const channel = await getChannelById(video.snippet.channelId);
+  const channel = await getChannelById({
+    ip,
+    channelId: video.snippet.channelId,
+  });
 
   if (channel == null) {
-    return undefined;
+    return Response.json({ error: "Channel not found" }, { status: 404 });
   }
 
-  return schema.videoDetails.parse({
+  const videoDetails = schema.videoDetails.parse({
     title: video.snippet?.title,
     thumbnail:
       video.snippet?.thumbnails?.maxres?.url ??
@@ -32,25 +56,6 @@ async function fetchVideoDetails(videoId: string) {
         channel.snippet?.thumbnails?.default?.url,
     },
   });
-}
-
-async function convertImageToBase64(href: string) {
-  const response = await fetch(href);
-  const buffer = await response.arrayBuffer();
-
-  const base64String = Buffer.from(buffer).toString("base64");
-  return `data:image/jpeg;base64,${base64String}`;
-}
-
-export async function GET(
-  req: Request,
-  { params }: { params: { videoId: string } }
-) {
-  const videoDetails = await fetchVideoDetails(params.videoId);
-
-  if (videoDetails == null) {
-    return Response.json({ error: "Video not found" }, { status: 404 });
-  }
 
   const [thumbnail, channelThumbnail] = await Promise.all([
     convertImageToBase64(videoDetails.thumbnail),

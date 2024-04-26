@@ -1,8 +1,20 @@
 import { youtube, youtube_v3 } from "@googleapis/youtube";
+import { Ratelimit } from "@upstash/ratelimit";
 
 import { env } from "@/lib/env";
 
 import { redis } from "./redis";
+
+export const ratelimit = {
+  abuse: new Ratelimit({
+    redis: redis,
+    limiter: Ratelimit.slidingWindow(5, "10 s"),
+  }),
+  free: new Ratelimit({
+    redis: redis,
+    limiter: Ratelimit.slidingWindow(30, "1 d"),
+  }),
+};
 
 const client = youtube({
   auth: env.YOUTUBE_API_KEY,
@@ -13,12 +25,23 @@ const aWeekInSeconds = 604800;
 
 const videoParts = ["snippet", "statistics", "contentDetails"];
 
-export async function getVideoById(videoId: string) {
+export async function getVideoById({
+  ip,
+  videoId,
+}: {
+  ip: string;
+  videoId: string;
+}) {
   const videoKey = `video(${videoParts.join(",")}):${videoId}`;
   let video = (await redis.get<youtube_v3.Schema$Video>(videoKey)) ?? undefined;
 
   if (video) {
     return video;
+  }
+
+  const { success } = await ratelimit.free.limit(ip);
+  if (!success) {
+    return undefined;
   }
 
   try {
@@ -48,13 +71,24 @@ export async function getVideoById(videoId: string) {
 
 const channelParts = ["snippet"];
 
-export async function getChannelById(channelId: string) {
+export async function getChannelById({
+  ip,
+  channelId,
+}: {
+  ip: string;
+  channelId: string;
+}) {
   const channelKey = `channel(${channelParts.join(",")}):${channelId}`;
   let channel =
     (await redis.get<youtube_v3.Schema$Channel>(channelKey)) ?? undefined;
 
   if (channel) {
     return channel;
+  }
+
+  const { success } = await ratelimit.free.limit(ip);
+  if (!success) {
+    return undefined;
   }
 
   try {
