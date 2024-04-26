@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { withAxiom } from "next-axiom";
 
 import * as schema from "@/lib/schema";
 import { getChannelById, getVideoById, ratelimit } from "@/lib/youtube-client";
@@ -11,7 +12,7 @@ async function convertImageToBase64(href: string) {
   return `data:image/jpeg;base64,${base64String}`;
 }
 
-export async function GET(
+export const GET = withAxiom(async function GET(
   request: NextRequest,
   { params: { videoId } }: { params: { videoId: string } }
 ) {
@@ -70,4 +71,4 @@ export async function GET(
       thumbnail: channelThumbnail,
     },
   });
-}
+});
