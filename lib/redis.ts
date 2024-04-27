@@ -11,9 +11,7 @@ const redis = new Redis(env.REDIS_PORT_NUMBER, env.REDIS_HOST, {
 
 export async function getJson<T = unknown>(key: string) {
   try {
-    const value = (await redis.call("JSON.GET", key, "$")) as
-      | string
-      | undefined;
+    const value = (await redis.get(key)) as string | undefined;
 
     if (value) {
       return JSON.parse(value) as T;
@@ -28,8 +26,7 @@ export async function setJson<T = unknown>(
   value: T,
   { ex }: { ex: number },
 ) {
-  await redis.call("JSON.SET", key, "$", JSON.stringify(value));
-  await redis.expire(key, ex);
+  await redis.set(key, JSON.stringify(value), "EX", ex);
 
   return value;
 }
