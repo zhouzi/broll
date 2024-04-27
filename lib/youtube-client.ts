@@ -1,20 +1,8 @@
-import { youtube, youtube_v3 } from "@googleapis/youtube";
-import { Ratelimit } from "@upstash/ratelimit";
+import { youtube, type youtube_v3 } from "@googleapis/youtube";
 
 import { env } from "@/lib/env";
 
-import { redis } from "./redis";
-
-export const ratelimit = {
-  abuse: new Ratelimit({
-    redis: redis,
-    limiter: Ratelimit.slidingWindow(5, "10 s"),
-  }),
-  free: new Ratelimit({
-    redis: redis,
-    limiter: Ratelimit.slidingWindow(30, "1 d"),
-  }),
-};
+import { getJson, setJson, ratelimit } from "./redis";
 
 const client = youtube({
   auth: env.YOUTUBE_API_KEY,
@@ -33,7 +21,7 @@ export async function getVideoById({
   videoId: string;
 }) {
   const videoKey = `video(${videoParts.join(",")}):${videoId}`;
-  let video = (await redis.get<youtube_v3.Schema$Video>(videoKey)) ?? undefined;
+  let video = (await getJson<youtube_v3.Schema$Video>(videoKey)) ?? undefined;
 
   if (video) {
     return video;
@@ -54,7 +42,10 @@ export async function getVideoById({
     video = videos?.[0];
   } catch (err) {
     // TODO: better type this error based on youtube's client (seems to be an AxiosError)
-    const errorMessage = (err as any).errors?.[0]?.message;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    const errorMessage = (err as any).errors?.[0]?.message as
+      | string
+      | undefined;
     if (errorMessage) {
       throw new Error(errorMessage);
     }
@@ -62,7 +53,7 @@ export async function getVideoById({
   }
 
   if (video) {
-    await redis.set(videoKey, video, { ex: aWeekInSeconds });
+    await setJson(videoKey, video, { ex: aWeekInSeconds });
     return video;
   }
 
@@ -80,7 +71,7 @@ export async function getChannelById({
 }) {
   const channelKey = `channel(${channelParts.join(",")}):${channelId}`;
   let channel =
-    (await redis.get<youtube_v3.Schema$Channel>(channelKey)) ?? undefined;
+    (await getJson<youtube_v3.Schema$Channel>(channelKey)) ?? undefined;
 
   if (channel) {
     return channel;
@@ -101,7 +92,10 @@ export async function getChannelById({
     channel = channels?.[0];
   } catch (err) {
     // TODO: better type this error based on youtube's client (seems to be an AxiosError)
-    const errorMessage = (err as any).errors?.[0]?.message;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    const errorMessage = (err as any).errors?.[0]?.message as
+      | string
+      | undefined;
     if (errorMessage) {
       throw new Error(errorMessage);
     }
@@ -109,7 +103,7 @@ export async function getChannelById({
   }
 
   if (channel) {
-    await redis.set(channelKey, channel, { ex: aWeekInSeconds });
+    await setJson(channelKey, channel, { ex: aWeekInSeconds });
     return channel;
   }
 

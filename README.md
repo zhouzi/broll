@@ -9,11 +9,11 @@ Elle fait suite à une demande de [BastiUi](https://x.com/BastiUi/status/1779866
 ## Installation
 
 1. `npm install`
-2. Créer le fichier `.env.local` en se basant sur le `.env.example`
+2. Créer le fichier `.env` en se basant sur le `.env.example`
 
 ## Déploiement
 
 1. [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzhouzi%2Fbroll&env=YOUTUBE_API_KEY)
 2. Ajouter les variables d'environnement en suivant les instructions d'installation
 3. Activer les analytics sur Vercel (optionnel)
-4. Créer une instance Redis sur Upstash et mettre à jour les variables d'environnement
+4. Attacher une instance Redis

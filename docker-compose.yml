@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: bitnami/redis:7.2.4
+    ports:
+      - "6379:6379"
+    env_file:
+      - .env
+    volumes:
+      - redis-broll-volume:/bitnami/redis/data
+  postgres:
+    image: postgres:alpine3.19
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-broll-volume:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+volumes:
+  redis-broll-volume:
+  postgres-broll-volume:

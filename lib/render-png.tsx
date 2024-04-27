@@ -1,14 +1,21 @@
 import satori from "satori";
 
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
-import * as schema from "@/lib/schema";
+
+import type * as schema from "@/lib/schema";
 
 export interface Fonts {
   robotoRegular: ArrayBuffer;
   robotoMedium: ArrayBuffer;
 }
 
-interface MessageData {
+interface Message {
+  _id: number;
+  svg: string;
+  width: number;
+}
+
+interface WorkerResponse {
   _id: number;
   blob: Blob;
 }
@@ -20,10 +27,9 @@ const convertSVGToPNG = (() => {
 
   const worker = new Worker(new URL("./resvg-worker.ts", import.meta.url));
 
-  // eslint-disable-next-line no-unused-vars
-  const pending = new Map<number, (messageData: MessageData) => void>();
+  const pending = new Map<number, (messageData: WorkerResponse) => void>();
 
-  worker.onmessage = (e: MessageEvent<MessageData>) => {
+  worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
     const resolve = pending.get(e.data._id);
 
     if (resolve) {
@@ -32,16 +38,17 @@ const convertSVGToPNG = (() => {
     }
   };
 
-  return async (msg: object) => {
-    const _id = Math.random();
+  return async ({ svg, width }: Pick<Message, "svg" | "width">) => {
+    const message: Message = {
+      _id: Math.random(),
+      svg,
+      width,
+    };
 
-    worker.postMessage({
-      ...msg,
-      _id,
-    });
+    worker.postMessage(message);
 
-    return new Promise<MessageData>((resolve) => {
-      pending.set(_id, resolve);
+    return new Promise<WorkerResponse>((resolve) => {
+      pending.set(message._id, resolve);
     });
   };
 })();
@@ -86,7 +93,7 @@ export async function renderPNG({
           const hex = segment.codePointAt(0)?.toString(16);
           if (hex) {
             const res = await fetch(
-              `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${hex}.svg`
+              `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${hex}.svg`,
             );
 
             if (res.ok) {
@@ -107,7 +114,7 @@ export async function renderPNG({
 
         return segment;
       },
-    }
+    },
   );
   const messageData = (await convertSVGToPNG?.({
     svg,

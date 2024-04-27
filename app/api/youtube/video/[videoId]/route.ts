@@ -1,8 +1,9 @@
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import { withAxiom } from "next-axiom";
 
+import { ratelimit } from "@/lib/redis";
 import * as schema from "@/lib/schema";
-import { getChannelById, getVideoById, ratelimit } from "@/lib/youtube-client";
+import { getChannelById, getVideoById } from "@/lib/youtube-client";
 
 async function convertImageToBase64(href: string) {
   const response = await fetch(href);
@@ -14,7 +15,7 @@ async function convertImageToBase64(href: string) {
 
 export const GET = withAxiom(async function GET(
   request: NextRequest,
-  { params: { videoId } }: { params: { videoId: string } }
+  { params: { videoId } }: { params: { videoId: string } },
 ) {
   const ip =
     request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";

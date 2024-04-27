@@ -8,16 +8,15 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import * as schema from "@/lib/schema";
+import { renderPNG, type Fonts } from "./render-png";
 
-import { renderPNG, Fonts } from "./render-png";
+import type * as schema from "@/lib/schema";
 
 export type RenderStatus = "idle" | "downloading" | "copying";
 
 interface UseDownloadPNGProps {
   videoDetails: schema.VideoDetails;
   theme: schema.Theme;
-  // eslint-disable-next-line no-unused-vars
   setRenderStatus: (status: RenderStatus) => void;
 }
 
@@ -37,12 +36,12 @@ export function useRenderPNG({
   useEffect(() => {
     const abortContoller = new AbortController();
 
-    Promise.all([
+    void Promise.all([
       fetch("/fonts/Roboto-Regular.ttf", {
         signal: abortContoller.signal,
       }).then((res) => res.arrayBuffer()),
       fetch("/fonts/Roboto-Medium.ttf", { signal: abortContoller.signal }).then(
-        (res) => res.arrayBuffer()
+        (res) => res.arrayBuffer(),
       ),
     ]).then(([robotoRegular, robotoMedium]) => {
       if (abortContoller.signal.aborted) {
@@ -56,9 +55,11 @@ export function useRenderPNG({
   }, []);
 
   const downloadPNGRef = useRef(
-    () => new Promise((resolve, reject) => reject("not ready"))
+    () => new Promise((resolve, reject) => reject("not ready")),
   );
-  const copyPNGRef = useRef(() => {});
+  const copyPNGRef = useRef(
+    () => new Promise((resolve, reject) => reject("not ready")),
+  );
 
   useEffect(() => {
     copyPNGRef.current = async () => {
@@ -74,7 +75,9 @@ export function useRenderPNG({
         theme,
       });
 
-      navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
       toast.success("Image copié dans ton presse papier");
 
       setRenderStatusRef.current("idle");
