@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+// import { signIn, signOut, useSession } from "next-auth/react";
 import queryString from "qs";
 import * as queryTypes from "query-types";
 import { useEffect, useState } from "react";
@@ -30,12 +30,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -54,7 +54,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { UserAvatar } from "@/components/user-avatar";
+// import { UserAvatar } from "@/components/user-avatar";
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
@@ -152,7 +152,7 @@ const defaultValues = formSchema.parse({
 });
 
 export default function Home() {
-  const session = useSession();
+  // const session = useSession();
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onBlur",
@@ -263,33 +263,35 @@ export default function Home() {
             gabin.app
           </a>
         </div>
-        <div className="flex gap-2">
-          {session.status === "authenticated" && session.data.user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="overflow-hidden rounded-full"
-                >
-                  <UserAvatar user={session.data.user} className="size-9" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => signOut()}>
-                  Se déconnecter
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Button variant="ghost" onClick={() => signIn()}>
-                Se connecter
-              </Button>
-              <Button onClick={() => signIn()}>S'inscrire</Button>
-            </>
-          )}
-        </div>
+        {
+          // <div className="flex gap-2">
+          //   {session.status === "authenticated" && session.data.user ? (
+          //     <DropdownMenu>
+          //       <DropdownMenuTrigger asChild>
+          //         <Button
+          //           variant="outline"
+          //           size="icon"
+          //           className="overflow-hidden rounded-full"
+          //         >
+          //           <UserAvatar user={session.data.user} className="size-9" />
+          //         </Button>
+          //       </DropdownMenuTrigger>
+          //       <DropdownMenuContent align="end">
+          //         <DropdownMenuItem onClick={() => signOut()}>
+          //           Se déconnecter
+          //         </DropdownMenuItem>
+          //       </DropdownMenuContent>
+          //     </DropdownMenu>
+          //   ) : (
+          //     <>
+          //       <Button variant="ghost" onClick={() => signIn()}>
+          //         Se connecter
+          //       </Button>
+          //       <Button onClick={() => signIn()}>S'inscrire</Button>
+          //     </>
+          //   )}
+          // </div>
+        }
       </header>
       <main className="flex flex-col-reverse gap-8 md:flex-row">
         <div className="flex-1">
