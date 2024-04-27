@@ -24,6 +24,8 @@ export const env = createEnv({
 
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+
+    PLAUSIBLE_CUSTOM_DOMAIN: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT: z.string().url(),
@@ -51,5 +53,7 @@ export const env = createEnv({
 
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+    PLAUSIBLE_CUSTOM_DOMAIN: process.env.PLAUSIBLE_CUSTOM_DOMAIN,
   },
 });
