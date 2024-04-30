@@ -68,7 +68,7 @@ export function YouTubeVideoCard({
           position: "relative",
         }}
       >
-        <img src={videoDetails.thumbnail} alt="" />
+        <img src={videoDetails.thumbnail} alt="" style={{ width: "100%" }} />
         {theme.options.showDuration && (
           <div
             style={{
