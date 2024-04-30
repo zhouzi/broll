@@ -127,3 +127,24 @@ export function getVideoId(href: string) {
 
   return null;
 }
+
+export const defaultVideoDetails = videoDetails.parse({
+  channel: {},
+});
+
+export const lightTheme = theme.parse({
+  card: card.parse({}),
+  duration: duration.parse({}),
+  progressBar: progressBar.parse({}),
+  options: options.parse({}),
+});
+
+export const darkTheme = theme.parse({
+  card: card.parse({
+    foreground: "#f1f1f1",
+    background: "#0f0f0f",
+  }),
+  duration: duration.parse({}),
+  progressBar: progressBar.parse({}),
+  options: options.parse({}),
+});

@@ -4,13 +4,9 @@ import { toast } from "sonner";
 
 import * as schema from "@/lib/schema";
 
-const defaultVideoDetails = schema.videoDetails.parse({
-  channel: {},
-});
-
 export function useVideoDetails(videoId: string) {
   const [cache, setCache] = useState<Record<string, schema.VideoDetails>>({
-    [schema.DEFAULT_VIDEO_ID]: defaultVideoDetails,
+    [schema.DEFAULT_VIDEO_ID]: schema.defaultVideoDetails,
   });
   const cacheRef = useRef(cache);
 
@@ -62,7 +58,9 @@ export function useVideoDetails(videoId: string) {
     return {
       loading: cachedVideoDetails == null,
       videoDetails:
-        cachedVideoDetails ?? previousCachedVideoDetails ?? defaultVideoDetails,
+        cachedVideoDetails ??
+        previousCachedVideoDetails ??
+        schema.defaultVideoDetails,
     };
   }, [cachedVideoDetails]);
 }

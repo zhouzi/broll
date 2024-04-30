@@ -76,23 +76,6 @@ const formSchema = z.object({
   theme: schema.theme,
 });
 
-const lightTheme = schema.theme.parse({
-  card: schema.card.parse({}),
-  duration: schema.duration.parse({}),
-  progressBar: schema.progressBar.parse({}),
-  options: schema.options.parse({}),
-});
-
-const darkTheme = schema.theme.parse({
-  card: schema.card.parse({
-    foreground: "#f1f1f1",
-    background: "#0f0f0f",
-  }),
-  duration: schema.duration.parse({}),
-  progressBar: schema.progressBar.parse({}),
-  options: schema.options.parse({}),
-});
-
 interface DefaultColorTheme {
   name: string;
   theme: schema.Theme;
@@ -101,11 +84,11 @@ interface DefaultColorTheme {
 const defaultColorThemes = {
   light: {
     name: "Clair",
-    theme: lightTheme,
+    theme: schema.lightTheme,
   },
   dark: {
     name: "Sombre",
-    theme: darkTheme,
+    theme: schema.darkTheme,
   },
 } satisfies Record<string, DefaultColorTheme>;
 
@@ -148,7 +131,7 @@ function findColorThemeIdByTheme(theme: schema.Theme) {
 }
 
 const defaultValues = formSchema.parse({
-  theme: lightTheme,
+  theme: schema.lightTheme,
 });
 
 export default function Home() {
