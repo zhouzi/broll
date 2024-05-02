@@ -1,4 +1,5 @@
 import { withAxiom } from "next-axiom";
+import { withPlausibleProxy } from "next-plausible";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -26,4 +27,4 @@ const nextConfig = {
   },
 };
 
-export default withAxiom(nextConfig);
+export default withAxiom(withPlausibleProxy()(nextConfig));
