@@ -27,4 +27,10 @@ const nextConfig = {
   },
 };
 
-export default withAxiom(withPlausibleProxy()(nextConfig));
+export default withAxiom(
+  withPlausibleProxy({
+    customDomain:
+      // TODO: figure out a way to import it from ./lib/env.ts
+      process.env.PLAUSIBLE_CUSTOM_DOMAIN,
+  })(nextConfig),
+);
