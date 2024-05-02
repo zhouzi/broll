@@ -3,12 +3,24 @@
   "parserOptions": {
     "project": true
   },
-  "plugins": ["unused-imports", "import", "@typescript-eslint", "drizzle"],
+  "plugins": [
+    "unused-imports",
+    "import",
+    "@typescript-eslint",
+    "drizzle",
+    "@remotion"
+  ],
   "extends": [
     "next/core-web-vitals",
     "plugin:import/recommended",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked"
+  ],
+  "overrides": [
+    {
+      "files": ["remotion/*.{ts,tsx}"],
+      "extends": ["plugin:@remotion/recommended"]
+    }
   ],
   "rules": {
     "no-console": "error",
