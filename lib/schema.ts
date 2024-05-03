@@ -14,7 +14,7 @@ dayjs.extend(relativeTimePlugin);
 
 export const DEFAULT_VIDEO_ID = "XEO3duW1A80";
 
-// const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
+export const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
 
 const DEFAULT_VIDEO_THUMBNAIL = defaultVideoThumbnail;
 

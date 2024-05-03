@@ -200,14 +200,43 @@ export default function Home() {
         queryTypes.parseObject(
           queryString.parse(window.location.search.slice(1)),
         ),
-      () => JSON.parse(localStorage.getItem("theme") ?? "{}") as unknown,
+      () => ({
+        // Legacy URL parameters, theme used to be the only thing stored in the URL
+        videoUrl: schema.DEFAULT_VIDEO_URL,
+        theme: queryTypes.parseObject(
+          queryString.parse(window.location.search.slice(1)),
+        ),
+      }),
+      () => JSON.parse(localStorage.getItem("formValues") ?? "{}") as unknown,
+      () => ({
+        // Legacy local storage values, theme used to be the only thing stored in local storage
+        videoUrl: schema.DEFAULT_VIDEO_URL,
+        theme: JSON.parse(localStorage.getItem("theme") ?? "{}") as unknown,
+      }),
     ];
     for (const parse of parsers) {
       try {
-        const parsedTheme = schema.theme.safeParse(parse());
+        const parsedFormValues = formSchema.safeParse(parse());
 
-        if (parsedTheme.success) {
-          form.setValue("theme", parsedTheme.data, { shouldDirty: true });
+        if (parsedFormValues.success) {
+          form.setValue("videoUrl", parsedFormValues.data.videoUrl, {
+            shouldDirty: true,
+          });
+          form.setValue("theme", parsedFormValues.data.theme, {
+            shouldDirty: true,
+          });
+
+          // Make sure the URL reflects the current parameters,
+          // whether they're loaded from localStorage or a legacy source
+          //
+          // Using the native history is the documented way of preventing rerenders:
+          // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#windowhistoryreplacestate
+          window.history.replaceState(
+            undefined,
+            "",
+            `${location.pathname}?${queryString.stringify(parsedFormValues.data)}`,
+          );
+
           return;
         }
       } catch (err) {}
@@ -218,9 +247,9 @@ export default function Home() {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const subscription = form.watch((values) => {
-      const parsedValues = formSchema.safeParse(values);
+      const parsedFormValues = formSchema.safeParse(values);
 
-      if (!parsedValues.success) {
+      if (!parsedFormValues.success) {
         return;
       }
 
@@ -232,11 +261,12 @@ export default function Home() {
         window.history.replaceState(
           undefined,
           "",
-          `${location.pathname}?${queryString.stringify(
-            parsedValues.data.theme,
-          )}`,
+          `${location.pathname}?${queryString.stringify(parsedFormValues.data)}`,
         );
-        localStorage.setItem("theme", JSON.stringify(parsedValues.data.theme));
+        localStorage.setItem(
+          "formValues",
+          JSON.stringify(parsedFormValues.data),
+        );
       }, 500);
     });
 
