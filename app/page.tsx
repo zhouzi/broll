@@ -309,11 +309,7 @@ export default function Home() {
       <main className="flex flex-col-reverse gap-8 md:flex-row">
         <div className="flex-1">
           <Card>
-            <CardHeader>
-              <CardTitle>Paramètres</CardTitle>
-              <CardDescription>Personnalisation de la vignette</CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <Form {...form}>
                 <form className="space-y-4">
                   <FormField
