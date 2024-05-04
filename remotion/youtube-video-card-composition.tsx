@@ -57,22 +57,26 @@ function slide({
 }) {
   const animationDuration = 30;
 
-  const enterStartsAt = 0;
+  const enterStartsAt = 0 + delay;
   const enterEndsAt = enterStartsAt + animationDuration;
 
-  const leaveStartsAt = durationInFrames - animationDuration;
-  // const leaveEndsAt = leaveStartsAt + durationInFrames;
+  const leaveStartsAt = durationInFrames - animationDuration - delay;
 
-  const progress = spring({
-    frame:
-      frame >= enterEndsAt && frame <= leaveStartsAt
-        ? frame
-        : frame % animationDuration,
-    fps,
-    delay,
-    durationInFrames: animationDuration,
-    reverse: frame > leaveStartsAt,
-  });
+  const progress =
+    frame < enterEndsAt
+      ? spring({
+          frame: frame - enterStartsAt,
+          fps,
+          durationInFrames: animationDuration,
+        })
+      : frame > leaveStartsAt
+        ? spring({
+            frame: frame - leaveStartsAt,
+            fps,
+            durationInFrames: animationDuration,
+            reverse: true,
+          })
+        : 1;
 
   return {
     opacity: progress,
