@@ -42,6 +42,7 @@ export function createScale(theme: schema.Theme, baseFactor: number) {
 interface YouTubeVideoCardAnimation {
   container: CSSProperties;
   thumbnail: CSSProperties;
+  progressBarProgress: CSSProperties;
   title: CSSProperties;
   channelTitle: CSSProperties;
   stats: CSSProperties;
@@ -61,6 +62,7 @@ export function YouTubeVideoCard({
   animation = {
     container: {},
     thumbnail: {},
+    progressBarProgress: {},
     title: {},
     channelTitle: {},
     stats: {},
@@ -121,6 +123,7 @@ export function YouTubeVideoCard({
               style={{
                 width: `${theme.options.progressBar}%`,
                 backgroundColor: theme.progressBar.foreground,
+                ...animation.progressBarProgress,
               }}
             />
           </div>

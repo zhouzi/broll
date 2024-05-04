@@ -7,6 +7,7 @@ import {
   continueRender,
   delayRender,
   staticFile,
+  interpolate,
 } from "remotion";
 import { z } from "zod";
 
@@ -85,14 +86,18 @@ function slide({
 }
 
 export const YouTubeVideoCardCompositionSchema = z.object({
+  theme: schema.theme,
   videoDetails: schema.videoDetails,
 });
 
 export function YouTubeVideoCardComposition({
+  theme,
   videoDetails,
 }: z.infer<typeof YouTubeVideoCardCompositionSchema>) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
+
+  const progressBarProgress = theme.options.progressBar ?? 100;
 
   return (
     <AbsoluteFill
@@ -102,9 +107,9 @@ export function YouTubeVideoCardComposition({
       }}
     >
       <YouTubeVideoCard
-        theme={schema.lightTheme}
+        theme={theme}
         videoDetails={videoDetails}
-        scale={createScale(schema.lightTheme, 1)}
+        scale={createScale(theme, 1)}
         animation={{
           container: slide({
             frame,
@@ -118,6 +123,20 @@ export function YouTubeVideoCardComposition({
             delay: 5,
             durationInFrames,
           }),
+          progressBarProgress: {
+            width: `${interpolate(
+              frame,
+              [0, durationInFrames],
+              [
+                progressBarProgress,
+                Math.min(100, progressBarProgress + durationInFrames / fps),
+              ],
+              {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              },
+            )}%`,
+          },
           title: slide({
             frame,
             fps,

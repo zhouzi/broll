@@ -16,6 +16,7 @@ export function Root() {
         component={YouTubeVideoCardComposition}
         schema={YouTubeVideoCardCompositionSchema}
         defaultProps={{
+          theme: schema.lightTheme,
           videoDetails: schema.defaultVideoDetails,
         }}
         durationInFrames={120}

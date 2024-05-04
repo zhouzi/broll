@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Player } from "@remotion/player";
 import { Checkbox } from "@/components/ui/checkbox";
 // import {
 //   DropdownMenu,
@@ -59,6 +60,7 @@ import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
+import { YouTubeVideoCardComposition } from "@/remotion/youtube-video-card-composition";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -612,11 +614,33 @@ export default function Home() {
           }}
         >
           <div className={roboto.className}>
-            <YouTubeVideoCard
-              videoDetails={videoDetails}
-              theme={validValues.theme}
-              scale={createScale(validValues.theme, 1)}
-            />
+            {false ? (
+              <YouTubeVideoCard
+                videoDetails={videoDetails}
+                theme={validValues.theme}
+                scale={createScale(validValues.theme, 1)}
+              />
+            ) : (
+              <Player
+                component={YouTubeVideoCardComposition}
+                inputProps={{
+                  theme: validValues.theme,
+                  videoDetails,
+                }}
+                durationInFrames={120}
+                compositionWidth={466}
+                compositionHeight={466}
+                style={{
+                  width: 450,
+                  height: 450,
+                }}
+                fps={30}
+                autoPlay
+                controls
+                showVolumeControls={false}
+                loop
+              />
+            )}
           </div>
           <div className="flex gap-2">
             <Button onClick={downloadPNG} disabled={renderStatus !== "idle"}>
