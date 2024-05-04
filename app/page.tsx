@@ -54,7 +54,7 @@ import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
-import { YouTubeVideoCardComposition } from "@/remotion/youtube-video-card-composition";
+import { YouTubeVideoCardVideo } from "@/remotion/youtube-video-card-video";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -616,7 +616,7 @@ export default function Home() {
               />
             ) : (
               <Player
-                component={YouTubeVideoCardComposition}
+                component={YouTubeVideoCardVideo}
                 inputProps={{
                   theme: validValues.theme,
                   videoDetails,

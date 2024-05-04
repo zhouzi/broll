@@ -1,4 +1,3 @@
-import { type CSSProperties } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -85,15 +84,15 @@ function slide({
   };
 }
 
-export const YouTubeVideoCardCompositionSchema = z.object({
+export const YouTubeVideoCardVideoSchema = z.object({
   theme: schema.theme,
   videoDetails: schema.videoDetails,
 });
 
-export function YouTubeVideoCardComposition({
+export function YouTubeVideoCardVideo({
   theme,
   videoDetails,
-}: z.infer<typeof YouTubeVideoCardCompositionSchema>) {
+}: z.infer<typeof YouTubeVideoCardVideoSchema>) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 

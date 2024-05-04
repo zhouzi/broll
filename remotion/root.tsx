@@ -4,17 +4,17 @@ import { Composition } from "remotion";
 import * as schema from "@/lib/schema";
 
 import {
-  YouTubeVideoCardComposition,
-  YouTubeVideoCardCompositionSchema,
-} from "./youtube-video-card-composition";
+  YouTubeVideoCardVideo,
+  YouTubeVideoCardVideoSchema,
+} from "./youtube-video-card-video";
 
 export function Root() {
   return (
     <>
       <Composition
-        id={YouTubeVideoCardComposition.name}
-        component={YouTubeVideoCardComposition}
-        schema={YouTubeVideoCardCompositionSchema}
+        id={YouTubeVideoCardVideo.name}
+        component={YouTubeVideoCardVideo}
+        schema={YouTubeVideoCardVideoSchema}
         defaultProps={{
           theme: schema.lightTheme,
           videoDetails: schema.defaultVideoDetails,
