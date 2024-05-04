@@ -18,7 +18,7 @@ export function Root() {
         defaultProps={{
           videoDetails: schema.defaultVideoDetails,
         }}
-        durationInFrames={60}
+        durationInFrames={120}
         fps={30}
         width={600}
         height={600}

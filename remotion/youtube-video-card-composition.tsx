@@ -44,56 +44,40 @@ Promise.all([robotoRegular.load(), robotoMedium.load()])
     console.log("Error loading font", err);
   });
 
-function fadeIn({
+function slide({
   frame,
   fps,
+  delay,
   durationInFrames,
 }: {
   frame: number;
   fps: number;
+  delay: number;
   durationInFrames: number;
 }) {
-  const progress = spring({ frame, fps, durationInFrames });
+  const animationDuration = 30;
+
+  const enterStartsAt = 0;
+  const enterEndsAt = enterStartsAt + animationDuration;
+
+  const leaveStartsAt = durationInFrames - animationDuration;
+  // const leaveEndsAt = leaveStartsAt + durationInFrames;
+
+  const progress = spring({
+    frame:
+      frame >= enterEndsAt && frame <= leaveStartsAt
+        ? frame
+        : frame % animationDuration,
+    fps,
+    delay,
+    durationInFrames: animationDuration,
+    reverse: frame > leaveStartsAt,
+  });
 
   return {
     opacity: progress,
-  };
-}
-
-function slideUp({
-  frame,
-  fps,
-  durationInFrames,
-}: {
-  frame: number;
-  fps: number;
-  durationInFrames: number;
-}) {
-  const progress = spring({ frame, fps, durationInFrames });
-
-  return {
     transform: `translateY(${20 * (1 - progress)}px)`,
   };
-}
-
-function compose(
-  { frame, fps, delay }: { frame: number; fps: number; delay: number },
-  ...fns: Array<
-    (args: {
-      frame: number;
-      fps: number;
-      durationInFrames: number;
-    }) => CSSProperties
-  >
-) {
-  return fns.reduce(
-    (acc, fn) =>
-      Object.assign(
-        acc,
-        fn({ frame: frame - delay, fps, durationInFrames: 30 }),
-      ),
-    {},
-  );
 }
 
 export const YouTubeVideoCardCompositionSchema = z.object({
@@ -104,7 +88,7 @@ export function YouTubeVideoCardComposition({
   videoDetails,
 }: z.infer<typeof YouTubeVideoCardCompositionSchema>) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
 
   return (
     <AbsoluteFill
@@ -118,11 +102,36 @@ export function YouTubeVideoCardComposition({
         videoDetails={videoDetails}
         scale={createScale(schema.lightTheme, 1)}
         animation={{
-          container: compose({ frame, fps, delay: 0 }, fadeIn, slideUp),
-          thumbnail: compose({ frame, fps, delay: 5 }, fadeIn),
-          title: compose({ frame, fps, delay: 10 }, fadeIn, slideUp),
-          channelTitle: compose({ frame, fps, delay: 15 }, fadeIn, slideUp),
-          stats: compose({ frame, fps, delay: 20 }, fadeIn, slideUp),
+          container: slide({
+            frame,
+            fps,
+            delay: 0,
+            durationInFrames,
+          }),
+          thumbnail: slide({
+            frame,
+            fps,
+            delay: 5,
+            durationInFrames,
+          }),
+          title: slide({
+            frame,
+            fps,
+            delay: 10,
+            durationInFrames,
+          }),
+          channelTitle: slide({
+            frame,
+            fps,
+            delay: 15,
+            durationInFrames,
+          }),
+          stats: slide({
+            frame,
+            fps,
+            delay: 20,
+            durationInFrames,
+          }),
         }}
       />
     </AbsoluteFill>
