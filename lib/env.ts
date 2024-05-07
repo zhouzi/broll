@@ -28,7 +28,7 @@ export const env = createEnv({
     PLAUSIBLE_CUSTOM_DOMAIN: z.string().optional(),
   },
   client: {
-    NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT: z.string().url(),
+    NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT: z.string().url().optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
