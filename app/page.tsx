@@ -602,8 +602,7 @@ export default function Home() {
                       onValueChange={(value) => {
                         form.setValue("layout",value)
                       }}
-                      value='taratata'
-                      // value={form.getValues("layout")}
+                      value={form.getValues("layout")}
                     >
                       <SelectTrigger className="max-w-[160px]">
                         <SelectValue placeholder="Personnalisé" />
