@@ -49,6 +49,14 @@ const redisRateLimitAdapter = {
     ) as Promise<TData>,
 };
 
+export class RateLimitError extends Error {
+  public readonly statusCode: number = 429;
+
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export const ratelimit = {
   abuse: new Ratelimit({
     redis: redisRateLimitAdapter,

@@ -2,7 +2,7 @@ import { youtube, type youtube_v3 } from "@googleapis/youtube";
 
 import { env } from "@/lib/env";
 
-import { getJson, setJson, ratelimit } from "./redis";
+import { getJson, setJson, ratelimit, RateLimitError } from "./redis";
 
 const client = youtube({
   auth: env.YOUTUBE_API_KEY,
@@ -27,9 +27,11 @@ export async function getVideoById({
     return video;
   }
 
-  const { success } = await ratelimit.free.limit(ip);
+  const { success, limit } = await ratelimit.free.limit(ip);
   if (!success) {
-    return undefined;
+    throw new RateLimitError(
+      `Tu as dépassé la limite de ${limit} demandes sur 24h, envoi un email à gabin.aureche@gmail.com pour un accès sans limite.`,
+    );
   }
 
   try {

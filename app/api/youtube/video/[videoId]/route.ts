@@ -1,7 +1,8 @@
+import { type youtube_v3 } from "@googleapis/youtube";
 import { type NextRequest } from "next/server";
 import { withAxiom } from "next-axiom";
 
-import { ratelimit } from "@/lib/redis";
+import { RateLimitError, ratelimit } from "@/lib/redis";
 import * as schema from "@/lib/schema";
 import { getChannelById, getVideoById } from "@/lib/youtube-client";
 
@@ -20,15 +21,37 @@ export const GET = withAxiom(async function GET(
   const ip =
     request.ip ?? request.headers.get("X-Forwarded-For") ?? "127.0.0.1";
 
-  const { success } = await ratelimit.abuse.limit(ip);
+  const { success, limit } = await ratelimit.abuse.limit(ip);
   if (!success) {
-    return Response.json({ error: "Rate limit exceeded" }, { status: 429 });
+    return Response.json(
+      {
+        error: `Tu as dépassé la limite de ${limit} demandes sur 10 secondes, réessaie plus tard.`,
+      },
+      { status: 429 },
+    );
   }
 
-  const video = await getVideoById({ ip, videoId });
+  let video: youtube_v3.Schema$Video | undefined = undefined;
+
+  try {
+    video = await getVideoById({ ip, videoId });
+  } catch (err) {
+    return err instanceof RateLimitError
+      ? Response.json({ error: err.message }, { status: err.statusCode })
+      : Response.json(
+          {
+            error:
+              "Une erreur est survenue lors de la récupération des informations de la vidéo, réessaie plus ou envoi un email à gabin.aureche@gmail.com",
+          },
+          { status: 500 },
+        );
+  }
 
   if (video?.snippet?.channelId == null) {
-    return Response.json({ error: "Video not found" }, { status: 404 });
+    return Response.json(
+      { error: "Cette vidéo est introuvable, vérifie l'URL." },
+      { status: 404 },
+    );
   }
 
   const channel = await getChannelById({
@@ -37,7 +60,10 @@ export const GET = withAxiom(async function GET(
   });
 
   if (channel == null) {
-    return Response.json({ error: "Channel not found" }, { status: 404 });
+    return Response.json(
+      { error: "La chaîne de cette vidéo est introuvable, vérifie l'URL." },
+      { status: 404 },
+    );
   }
 
   const videoDetails = schema.videoDetails.parse({

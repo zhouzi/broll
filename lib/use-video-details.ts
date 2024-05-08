@@ -40,9 +40,12 @@ export function useVideoDetails(videoId: string) {
         });
       }
 
-      toast.error(
-        "Une erreur est survenue lors de la récupération des informations de la vidéo",
-      );
+      return res.json().then((error: unknown) => {
+        const errorMessage =
+          (error as { error: string }).error ??
+          "Une erreur est survenue lors de la récupération des informations de la vidéo, réessaie plus ou envoi un email à gabin.aureche@gmail.com";
+        toast.error(errorMessage);
+      });
     });
 
     return () => abortController.abort("cleanup");
