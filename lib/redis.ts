@@ -64,6 +64,6 @@ export const ratelimit = {
   }),
   free: new Ratelimit({
     redis: redisRateLimitAdapter,
-    limiter: Ratelimit.slidingWindow(30, "1 d"),
+    limiter: Ratelimit.slidingWindow(100, "1 d"),
   }),
 };
