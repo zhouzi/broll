@@ -59,6 +59,7 @@ import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
 import * as schema from "@/lib/schema";
 import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
+import { cn } from "@/lib/utils";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -74,6 +75,7 @@ const formSchema = z.object({
       message: "Le format de l'URL est invalide",
     }),
   theme: schema.theme,
+  layout: z.string().default("vertical"),
 });
 
 const lightTheme = schema.theme.parse({
@@ -163,6 +165,7 @@ export default function Home() {
   const [validValues, setValidValues] = useState(() => ({
     videoId: schema.getVideoId(form.getValues("videoUrl"))!,
     theme: form.getValues("theme"),
+    layout: form.getValues("layout"),
   }));
   useEffect(() => {
     const subscription = form.watch((values) => {
@@ -176,6 +179,7 @@ export default function Home() {
           theme: parsedTheme.success
             ? parsedTheme.data
             : currentValidValues.theme,
+          layout: values.layout ?? currentValidValues.layout,
         };
       });
     });
@@ -206,12 +210,16 @@ export default function Home() {
         theme: queryTypes.parseObject(
           queryString.parse(window.location.search.slice(1)),
         ),
+        // layout: schema.DEFAULT_LAYOUT,
       }),
       () => JSON.parse(localStorage.getItem("formValues") ?? "{}") as unknown,
       () => ({
         // Legacy local storage values, theme used to be the only thing stored in local storage
         videoUrl: schema.DEFAULT_VIDEO_URL,
         theme: JSON.parse(localStorage.getItem("theme") ?? "{}") as unknown,
+        layout: localStorage.getItem("layout") ?? schema.DEFAULT_LAYOUT,
+        // layout: JSON.parse(localStorage.getItem("layout") ?? "{}") as unknown,
+        // layout: schema.DEFAULT_LAYOUT,
       }),
     ];
     for (const parse of parsers) {
@@ -223,6 +231,9 @@ export default function Home() {
             shouldDirty: true,
           });
           form.setValue("theme", parsedFormValues.data.theme, {
+            shouldDirty: true,
+          });
+          form.setValue("layout", parsedFormValues.data.layout, {
             shouldDirty: true,
           });
 
@@ -239,7 +250,7 @@ export default function Home() {
 
           return;
         }
-      } catch (err) {}
+      } catch (err) { }
     }
   }, [form]);
 
@@ -274,7 +285,10 @@ export default function Home() {
   }, [form]);
 
   return (
-    <div className="m-auto max-w-[900px] px-4 py-6">
+    <div className={cn(
+      "m-auto px-4 py-6",
+      form.getValues('layout') === schema.DEFAULT_LAYOUT ? "max-w-[900px]" : "max-w-[1600px]"
+    )}>
       <header className="flex items-center justify-between py-4">
         <div className="inline-flex items-baseline gap-1">
           <Link
@@ -579,6 +593,28 @@ export default function Home() {
                             </SelectItem>
                           ),
                         )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="flex-1">Layout</Label>
+                    <Select
+                      onValueChange={(value) => {
+                        form.setValue("layout",value)
+                      }}
+                      value='taratata'
+                      // value={form.getValues("layout")}
+                    >
+                      <SelectTrigger className="max-w-[160px]">
+                        <SelectValue placeholder="Personnalisé" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={'vertical'}>
+                          Vertical
+                        </SelectItem>
+                        <SelectItem value={'horizontal'}>
+                          Horizontal
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

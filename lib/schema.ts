@@ -16,6 +16,8 @@ export const DEFAULT_VIDEO_ID = "XEO3duW1A80";
 
 export const DEFAULT_VIDEO_URL = `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`;
 
+export const DEFAULT_LAYOUT = 'vertical';
+
 const DEFAULT_VIDEO_THUMBNAIL = defaultVideoThumbnail;
 
 const DEFAULT_CHANNEL_THUMBNAIL = defaultChannelThumbnail;
