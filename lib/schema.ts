@@ -92,14 +92,12 @@ export const options = z.object({
       z.object({ type: z.enum(["image"]) }),
       z.object({
         type: z.enum(["video"]),
-        duration:
-          // TODO: this is duplicated from the video's schema @/remotion/youtube-video-card-video.tsx
-          z
-            .number()
-            .min(4)
-            .max(2 * 60)
-            .optional()
-            .default(4),
+        duration: z
+          .number()
+          .min(4)
+          .max(2 * 60)
+          .optional()
+          .default(4),
       }),
     ])
     .default({ type: "image" }),

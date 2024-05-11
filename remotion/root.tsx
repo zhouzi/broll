@@ -17,7 +17,6 @@ export function Root() {
         component={YouTubeVideoCardVideo}
         schema={YouTubeVideoCardVideoSchema}
         defaultProps={{
-          duration: 4,
           theme: schema.lightTheme,
           videoDetails: schema.defaultVideoDetails,
         }}

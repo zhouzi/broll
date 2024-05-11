@@ -629,7 +629,6 @@ export default function Home() {
                 <Player
                   component={YouTubeVideoCardVideo}
                   inputProps={{
-                    duration: 4,
                     theme: validValues.theme,
                     videoDetails,
                   }}

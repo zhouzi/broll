@@ -86,12 +86,6 @@ function slide({
 }
 
 export const YouTubeVideoCardVideoSchema = z.object({
-  duration: z
-    .number()
-    .min(4)
-    .max(2 * 60)
-    .optional()
-    .default(4),
   theme: schema.theme,
   videoDetails: schema.videoDetails,
 });
@@ -101,7 +95,11 @@ type YouTubeVideoCardVideoProps = z.infer<typeof YouTubeVideoCardVideoSchema>;
 export const calculateMetadata: CalculateMetadataFunction<YouTubeVideoCardVideoProps> =
   async function calculateMetadata({ props }) {
     const fps = 30;
-    const durationInFrames = props.duration * fps;
+    const durationInSeconds =
+      props.theme.options.exportAs.type === "video"
+        ? props.theme.options.exportAs.duration
+        : 4;
+    const durationInFrames = durationInSeconds * fps;
 
     return {
       durationInFrames,
