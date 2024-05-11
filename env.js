@@ -26,6 +26,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
 
     PLAUSIBLE_CUSTOM_DOMAIN: z.string().optional(),
+
+    REMOTION_AWS_ACCESS_KEY_ID: z.string().optional(),
+    REMOTION_AWS_SECRET_ACCESS_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT: z.string().url().optional(),
@@ -55,5 +58,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 
     PLAUSIBLE_CUSTOM_DOMAIN: process.env.PLAUSIBLE_CUSTOM_DOMAIN,
+
+    REMOTION_AWS_ACCESS_KEY_ID: process.env.REMOTION_AWS_ACCESS_KEY_ID,
+    REMOTION_AWS_SECRET_ACCESS_KEY: process.env.REMOTION_AWS_SECRET_ACCESS_KEY,
   },
 });

@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { DownloadVideoButton } from "@/components/download-video-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -637,6 +638,7 @@ export default function Home() {
             )}
           </div>
           <div className="flex gap-2">
+            <DownloadVideoButton theme={validValues.theme} videoDetails={videoDetails} />
             <Button onClick={downloadPNG} disabled={renderStatus !== "idle"}>
               {renderStatus === "downloading" ? (
                 <>
