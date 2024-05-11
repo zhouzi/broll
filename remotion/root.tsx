@@ -6,6 +6,7 @@ import * as schema from "@/lib/schema";
 import {
   YouTubeVideoCardVideo,
   YouTubeVideoCardVideoSchema,
+  calculateMetadata,
 } from "./youtube-video-card-video";
 
 export function Root() {
@@ -16,11 +17,13 @@ export function Root() {
         component={YouTubeVideoCardVideo}
         schema={YouTubeVideoCardVideoSchema}
         defaultProps={{
+          duration: 4,
           theme: schema.lightTheme,
           videoDetails: schema.defaultVideoDetails,
         }}
         durationInFrames={120}
         fps={30}
+        calculateMetadata={calculateMetadata}
         width={600}
         height={600}
       />

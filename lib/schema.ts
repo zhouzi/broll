@@ -87,6 +87,22 @@ export const options = z.object({
   showChannelThumbnail: z.boolean().default(true),
   showChannelTitle: z.boolean().default(true),
   progressBar: z.number().min(0).max(100).optional(),
+  exportAs: z
+    .union([
+      z.object({ type: z.enum(["image"]) }),
+      z.object({
+        type: z.enum(["video"]),
+        duration:
+          // TODO: this is duplicated from the video's schema @/remotion/youtube-video-card-video.tsx
+          z
+            .number()
+            .min(4)
+            .max(2 * 60)
+            .optional()
+            .default(4),
+      }),
+    ])
+    .default({ type: "image" }),
 });
 
 export const theme = z.object({

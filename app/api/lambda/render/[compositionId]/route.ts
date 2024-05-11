@@ -35,7 +35,9 @@ export async function POST(
 
   return Response.json(
     await renderMediaOnLambda({
-      codec: "h264",
+      codec: "vp8",
+      pixelFormat: "yuva420p",
+      imageFormat: "png",
       functionName: speculateFunctionName({
         diskSizeInMb: DISK,
         memorySizeInMb: RAM,
@@ -48,7 +50,7 @@ export async function POST(
       framesPerLambda: 10,
       downloadBehavior: {
         type: "download",
-        fileName: `${inputProps.videoDetails.title}.mp4`,
+        fileName: `${inputProps.videoDetails.title}.webm`,
       },
     }),
   );
