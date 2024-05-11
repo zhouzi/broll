@@ -25,7 +25,7 @@ export function DownloadVideoButton({
       {state.status !== "idle" ? (
         <>
           <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />{" "}
-          Téléchargement...
+          Téléchargement... {Math.round(state.progress * 100)}%
         </>
       ) : (
         <>
