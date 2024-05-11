@@ -35,9 +35,11 @@ export async function POST(
 
   return Response.json(
     await renderMediaOnLambda({
-      codec: "vp8",
-      pixelFormat: "yuva420p",
+      codec: "prores",
+      pixelFormat: "yuva444p10le",
       imageFormat: "png",
+      proResProfile: "4444",
+      scale: 2,
       functionName: speculateFunctionName({
         diskSizeInMb: DISK,
         memorySizeInMb: RAM,
