@@ -52,7 +52,7 @@ export async function POST(
       framesPerLambda: 10,
       downloadBehavior: {
         type: "download",
-        fileName: `${inputProps.videoDetails.title}.webm`,
+        fileName: `${inputProps.videoDetails.title}.mov`,
       },
     }),
   );
