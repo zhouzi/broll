@@ -3,8 +3,8 @@ import { AxiomWebVitals } from "next-axiom";
 import PlausibleProvider from "next-plausible";
 
 import { Toaster } from "@/components/ui/sonner";
+import { env } from "@/env";
 import { getServerAuthSession } from "@/lib/auth";
-import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
 
 import { NextAuthProvider } from "./next-auth-provider";

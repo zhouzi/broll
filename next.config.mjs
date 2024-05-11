@@ -1,6 +1,8 @@
 import { withAxiom } from "next-axiom";
 import { withPlausibleProxy } from "next-plausible";
 
+import { env } from "./env.js";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
@@ -29,8 +31,6 @@ const nextConfig = {
 
 export default withAxiom(
   withPlausibleProxy({
-    customDomain:
-      // TODO: figure out a way to import it from ./lib/env.ts
-      process.env.PLAUSIBLE_CUSTOM_DOMAIN,
+    customDomain: env.PLAUSIBLE_CUSTOM_DOMAIN,
   })(nextConfig),
 );

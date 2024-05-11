@@ -1,6 +1,6 @@
 import { youtube, type youtube_v3 } from "@googleapis/youtube";
 
-import { env } from "@/lib/env";
+import { env } from "@/env";
 
 import { getJson, setJson, ratelimit, RateLimitError } from "./redis";
 

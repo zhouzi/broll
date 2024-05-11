@@ -1,7 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "ioredis";
 
-import { env } from "@/lib/env";
+import { env } from "@/env";
 
 // TODO: creating this client this way yields errors when building
 //       as if it was trying to establish a connection, which is not good

@@ -2,7 +2,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-import { env } from "@/lib/env";
+import { env } from "@/env";
 
 import { db } from "./db";
 

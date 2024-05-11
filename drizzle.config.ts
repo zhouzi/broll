@@ -1,6 +1,6 @@
 import { Config } from "drizzle-kit";
 
-import { env } from "./lib/env";
+import { env } from "./env";
 
 export default {
   driver: "pg",
