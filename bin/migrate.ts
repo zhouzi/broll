@@ -5,6 +5,6 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import config from "@/drizzle.config";
 import { db } from "@/lib/db";
 
-(async () => {
+void (async () => {
   await migrate(db, { migrationsFolder: path.join(process.cwd(), config.out) });
 })();
