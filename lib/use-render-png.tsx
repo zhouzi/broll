@@ -40,9 +40,9 @@ export function useRenderPNG({
       fetch("/fonts/Roboto-Regular.ttf", {
         signal: abortContoller.signal,
       }).then((res) => res.arrayBuffer()),
-      fetch("/fonts/Roboto-Medium.ttf", { signal: abortContoller.signal }).then(
-        (res) => res.arrayBuffer(),
-      ),
+      fetch("/fonts/Roboto-Medium.ttf", {
+        signal: abortContoller.signal,
+      }).then((res) => res.arrayBuffer()),
     ]).then(([robotoRegular, robotoMedium]) => {
       if (abortContoller.signal.aborted) {
         return;

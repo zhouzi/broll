@@ -43,7 +43,7 @@ interface YouTubeVideoCardProps {
   scale: ReturnType<typeof createScale>;
 }
 
-export function YouTubeVideoCard({
+export function YouTubeVideoCardHorizontal({
   videoDetails,
   theme,
   scale,
@@ -52,23 +52,32 @@ export function YouTubeVideoCard({
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
         backgroundColor: theme.card.background,
         padding: `${scale.padding(7.5)}px`,
         borderRadius: `${scale.borderRadius(2) + scale.padding(7.5)}px`,
         width: `${scale.width}px`,
+        gap: `${scale.fontSize(0.6)}px`,
       }}
     >
       <div
         style={{
           display: "flex",
+          flexGrow: "1",
           marginBottom: `${scale.fontSize(0.6)}px`,
           borderRadius: `${scale.borderRadius(2)}px`,
           overflow: "hidden",
           position: "relative",
+          minWidth: `${scale.width / 2}px`
+          // maxWidth: "100%",
+          // width: "50%",
         }}
       >
-        <img src={videoDetails.thumbnail} alt="" />
+        <img src={videoDetails.thumbnail} alt=""
+          style={{
+            // maxWidth: "100%",
+            width: "100%",
+          }}
+        />
         {theme.options.showDuration && (
           <div
             style={{
@@ -106,35 +115,58 @@ export function YouTubeVideoCard({
           </div>
         )}
       </div>
-      <div style={{ display: "flex", gap: `${scale.fontSize(0.6)}px` }}>
-        {theme.options.showChannelThumbnail && (
-          <img
-            src={videoDetails.channel.thumbnail}
-            alt=""
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            color: theme.card.foreground,
+            // marginBottom: `${scale.fontSize(0.35)}px`,
+            ...scale.text(1),
+          }}
+        >
+          {videoDetails.title}
+        </div>
+        {(theme.options.showViews || theme.options.showPublishedAt) && (
+          <div
             style={{
-              borderRadius: "100%",
-              width: `${scale.fontSize(2.6)}px`,
-              height: `${scale.fontSize(2.6)}px`,
-              display: scale.fontSize(2.6) === 0 ? 'none' : 'block',
+              color: Color(theme.card.foreground).fade(0.4).toString(),
+              ...scale.text(0.875),
+              fontWeight: 400,
+              marginTop: `${scale.fontSize(0.2)}px`,
             }}
-          />
+          >
+            {[
+              theme.options.showViews && videoDetails.views,
+              theme.options.showPublishedAt && videoDetails.publishedAt,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </div>
         )}
         <div
           style={{
             display: "flex",
-            flex: 1,
-            flexDirection: "column",
+            alignItems: "center",
+            gap: `${scale.fontSize(0.4)}px`,
+            marginTop: `${scale.fontSize(0.4)}px`,
           }}
         >
-          <div
-            style={{
-              color: theme.card.foreground,
-              marginBottom: `${scale.fontSize(0.35)}px`,
-              ...scale.text(1),
-            }}
-          >
-            {videoDetails.title}
-          </div>
+          {theme.options.showChannelThumbnail && (
+            <img
+              src={videoDetails.channel.thumbnail}
+              alt=""
+              style={{
+                borderRadius: "100%",
+                width: `${scale.fontSize(2.6)}px`,
+                height: `${scale.fontSize(2.6)}px`,
+                // display: "none",
+              }}
+            />
+          )}
           {theme.options.showChannelTitle && (
             <div
               style={{
@@ -145,23 +177,6 @@ export function YouTubeVideoCard({
               }}
             >
               {videoDetails.channel.title}
-            </div>
-          )}
-          {(theme.options.showViews || theme.options.showPublishedAt) && (
-            <div
-              style={{
-                color: Color(theme.card.foreground).fade(0.4).toString(),
-                ...scale.text(0.875),
-                fontWeight: 400,
-                marginTop: `${scale.fontSize(0.2)}px`,
-              }}
-            >
-              {[
-                theme.options.showViews && videoDetails.views,
-                theme.options.showPublishedAt && videoDetails.publishedAt,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
             </div>
           )}
         </div>

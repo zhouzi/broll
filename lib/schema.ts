@@ -89,6 +89,7 @@ export const options = z.object({
   showChannelThumbnail: z.boolean().default(true),
   showChannelTitle: z.boolean().default(true),
   progressBar: z.number().min(0).max(100).optional(),
+  layout: z.string().default("vertical"),
 });
 
 export const theme = z.object({

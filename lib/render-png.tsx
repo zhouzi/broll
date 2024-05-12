@@ -1,6 +1,8 @@
 import satori from "satori";
 
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
+import { YouTubeVideoCardHorizontal } from "@/components/youtube-video-card-horizontal";
+import { DEFAULT_LAYOUT } from "@/lib/schema";
 
 import type * as schema from "@/lib/schema";
 
@@ -66,12 +68,22 @@ export async function renderPNG({
 }: RenderPNGProps) {
   const scale = createScale(theme, 6);
 
+  // eslint-disable-next-line no-console
+  console.log('videodetails 1 :' , theme)
+
   const svg = await satori(
-    <YouTubeVideoCard
-      videoDetails={videoDetails}
-      theme={theme}
-      scale={scale}
-    />,
+    theme.options.layout === DEFAULT_LAYOUT ?
+      < YouTubeVideoCard
+        videoDetails={videoDetails}
+        theme={theme}
+        scale={scale}
+      /> :
+      < YouTubeVideoCardHorizontal
+        videoDetails={videoDetails}
+        theme={theme}
+        scale={scale}
+      />
+    ,
     {
       width: scale.width,
       fonts: [
