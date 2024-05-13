@@ -1,4 +1,3 @@
-"use client";
 import {
   useCallback,
   useEffect,
@@ -61,13 +60,13 @@ export function useRenderPNG({
     () => new Promise((resolve, reject) => reject("not ready")),
   );
 
-  useEffect(() => {
-    copyPNGRef.current = async () => {
+  useLayoutEffect(() => {
+    const renderPNGToBlob = async (status: RenderStatus) => {
       if (!fontsRef.current) {
         throw new Error("fonts not loaded");
       }
 
-      setRenderStatusRef.current("copying");
+      setRenderStatusRef.current(status);
 
       const { blob } = await renderPNG({
         fonts: fontsRef.current,
@@ -75,27 +74,18 @@ export function useRenderPNG({
         theme,
       });
 
+      return blob;
+    };
+    copyPNGRef.current = async () => {
       await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
+        new ClipboardItem({ "image/png": await renderPNGToBlob("copying") }),
       ]);
       toast.success("Image copié dans ton presse papier");
 
       setRenderStatusRef.current("idle");
     };
     downloadPNGRef.current = async () => {
-      if (!fontsRef.current) {
-        throw new Error("fonts not loaded");
-      }
-
-      setRenderStatusRef.current("downloading");
-
-      const { blob } = await renderPNG({
-        fonts: fontsRef.current,
-        videoDetails,
-        theme,
-      });
-      const url = URL.createObjectURL(blob);
-
+      const url = URL.createObjectURL(await renderPNGToBlob("downloading"));
       const a = document.createElement("a");
       a.href = url;
       a.download = `${videoDetails.title}.png`;
