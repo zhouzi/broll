@@ -10,14 +10,14 @@ export const env = createEnv({
     YOUTUBE_API_KEY: z.string(),
 
     REDIS_HOST: z.string(),
-    REDIS_PORT_NUMBER: z.string().transform(Number),
+    REDIS_PORT_NUMBER: z.coerce.number(),
     REDIS_PASSWORD: z.string(),
 
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL: z.string().url(),
 
     POSTGRES_HOST: z.string(),
-    POSTGRES_PORT: z.string().transform(Number),
+    POSTGRES_PORT: z.coerce.number(),
     POSTGRES_DB: z.string(),
     POSTGRES_USER: z.string(),
     POSTGRES_PASSWORD: z.string(),
