@@ -672,7 +672,7 @@ export default function Home() {
               < YouTubeVideoCardHorizontal
                 videoDetails={videoDetails}
                 theme={validValues.theme}
-                scale={createScale(validValues.theme, 6)}
+                scale={createScale(validValues.theme, 1)}
               />
             }
           </div>
