@@ -55,27 +55,31 @@ export function YouTubeVideoCardHorizontal({
         backgroundColor: theme.card.background,
         padding: `${scale.padding(7.5)}px`,
         borderRadius: `${scale.borderRadius(2) + scale.padding(7.5)}px`,
-        width: `${scale.width}px`,
         gap: `${scale.fontSize(0.6)}px`,
+        boxSizing: 'border-box',
       }}
     >
       <div
         style={{
           display: "flex",
           flexGrow: "1",
-          marginBottom: `${scale.fontSize(0.6)}px`,
+          // marginBottom: `${scale.fontSize(0.6)}px`,
           borderRadius: `${scale.borderRadius(2)}px`,
           overflow: "hidden",
           position: "relative",
-          minWidth: `${scale.width / 2}px`
+          width: `${scale.width / 3}px`,
+          // alignItems: 'flex-end',
           // maxWidth: "100%",
           // width: "50%",
         }}
       >
         <img src={videoDetails.thumbnail} alt=""
+        // width={scale.width / 2.5} height={400}
           style={{
-            // maxWidth: "100%",
-            width: "100%",
+            width: `${scale.width / 3}px`,
+            height: 'auto',
+            objectFit: "cover",
+            // width: "100%",
           }}
         />
         {theme.options.showDuration && (
@@ -119,12 +123,12 @@ export function YouTubeVideoCardHorizontal({
         style={{
           display: "flex",
           flexDirection: "column",
+          maxWidth: `${scale.width / 2.5}px`,
         }}
       >
         <div
           style={{
             color: theme.card.foreground,
-            // marginBottom: `${scale.fontSize(0.35)}px`,
             ...scale.text(1),
           }}
         >
@@ -163,7 +167,7 @@ export function YouTubeVideoCardHorizontal({
                 borderRadius: "100%",
                 width: `${scale.fontSize(2.6)}px`,
                 height: `${scale.fontSize(2.6)}px`,
-                // display: "none",
+                display: scale.fontSize(2.6) === 0 ? 'none' : 'block',
               }}
             />
           )}
