@@ -1,13 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 
 import { renderPNG, type Fonts } from "./render-png";
+import { useLatestCallback } from "./use-latest-callback";
 
 import type * as schema from "@/lib/schema";
 
@@ -22,14 +17,8 @@ interface UseDownloadPNGProps {
 export function useRenderPNG({
   videoDetails,
   theme,
-  ...props
+  setRenderStatus,
 }: UseDownloadPNGProps) {
-  const setRenderStatusRef = useRef(props.setRenderStatus);
-
-  useLayoutEffect(() => {
-    setRenderStatusRef.current = props.setRenderStatus;
-  }, [props.setRenderStatus]);
-
   const fontsRef = useRef<Fonts | undefined>(undefined);
 
   useEffect(() => {
@@ -47,56 +36,49 @@ export function useRenderPNG({
         return;
       }
 
-      fontsRef.current = { robotoRegular, robotoMedium };
+      fontsRef.current = {
+        robotoRegular,
+        robotoMedium,
+      };
     });
 
     return () => abortContoller.abort("cleanup");
   }, []);
 
-  const downloadPNGRef = useRef(
-    () => new Promise((resolve, reject) => reject("not ready")),
-  );
-  const copyPNGRef = useRef(
-    () => new Promise((resolve, reject) => reject("not ready")),
-  );
+  const renderPNGToBlob = async (status: RenderStatus) => {
+    if (!fontsRef.current) {
+      throw new Error("fonts not loaded");
+    }
 
-  useLayoutEffect(() => {
-    const renderPNGToBlob = async (status: RenderStatus) => {
-      if (!fontsRef.current) {
-        throw new Error("fonts not loaded");
-      }
+    setRenderStatus(status);
 
-      setRenderStatusRef.current(status);
+    const { blob } = await renderPNG({
+      fonts: fontsRef.current,
+      videoDetails,
+      theme,
+    });
 
-      const { blob } = await renderPNG({
-        fonts: fontsRef.current,
-        videoDetails,
-        theme,
-      });
+    return blob;
+  };
 
-      return blob;
-    };
-    copyPNGRef.current = async () => {
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": await renderPNGToBlob("copying") }),
-      ]);
-      toast.success("Image copié dans ton presse papier");
+  const downloadPNG = useLatestCallback(async () => {
+    const url = URL.createObjectURL(await renderPNGToBlob("downloading"));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${videoDetails.title}.png`;
+    a.click();
 
-      setRenderStatusRef.current("idle");
-    };
-    downloadPNGRef.current = async () => {
-      const url = URL.createObjectURL(await renderPNGToBlob("downloading"));
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${videoDetails.title}.png`;
-      a.click();
+    setRenderStatus("idle");
+  });
 
-      setRenderStatusRef.current("idle");
-    };
-  }, [fontsRef, theme, videoDetails]);
+  const copyPNG = useLatestCallback(async () => {
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": await renderPNGToBlob("copying") }),
+    ]);
+    toast.success("Image copié dans ton presse papier");
 
-  const downloadPNG = useCallback(() => downloadPNGRef.current(), []);
-  const copyPNG = useCallback(() => copyPNGRef.current(), []);
+    setRenderStatus("idle");
+  });
 
   return useMemo(() => ({ downloadPNG, copyPNG }), [downloadPNG, copyPNG]);
 }
