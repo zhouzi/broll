@@ -195,7 +195,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const parsers = [
+    const initialValues = [
       () =>
         queryTypes.parseObject(
           queryString.parse(window.location.search.slice(1)),
@@ -213,34 +213,45 @@ export default function Home() {
         videoUrl: schema.DEFAULT_VIDEO_URL,
         theme: JSON.parse(localStorage.getItem("theme") ?? "{}") as unknown,
       }),
-    ];
-    for (const parse of parsers) {
-      try {
-        const parsedFormValues = formSchema.safeParse(parse());
+    ]
+      .reverse()
+      .reduce<z.infer<typeof formSchema>>((acc, parse) => {
+        let parsed: unknown = {};
+
+        try {
+          parsed = parse();
+        } catch (err) {}
+
+        if (parsed == null || Object.keys(parsed).length === 0) {
+          return acc;
+        }
+
+        const parsedFormValues = formSchema.safeParse(deepMerge(acc, parsed));
 
         if (parsedFormValues.success) {
-          form.setValue("videoUrl", parsedFormValues.data.videoUrl, {
-            shouldDirty: true,
-          });
-          form.setValue("theme", parsedFormValues.data.theme, {
-            shouldDirty: true,
-          });
-
-          // Make sure the URL reflects the current parameters,
-          // whether they're loaded from localStorage or a legacy source
-          //
-          // Using the native history is the documented way of preventing rerenders:
-          // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#windowhistoryreplacestate
-          window.history.replaceState(
-            undefined,
-            "",
-            `${location.pathname}?${queryString.stringify(parsedFormValues.data)}`,
-          );
-
-          return;
+          return parsedFormValues.data;
         }
-      } catch (err) {}
-    }
+
+        return acc;
+      }, defaultValues);
+
+    form.setValue("videoUrl", initialValues.videoUrl, {
+      shouldDirty: true,
+    });
+    form.setValue("theme", initialValues.theme, {
+      shouldDirty: true,
+    });
+
+    // Make sure the URL reflects the current parameters,
+    // whether they're loaded from localStorage or a legacy source
+    //
+    // Using the native history is the documented way of preventing rerenders:
+    // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#windowhistoryreplacestate
+    window.history.replaceState(
+      undefined,
+      "",
+      `${location.pathname}?${queryString.stringify(initialValues)}`,
+    );
   }, [form]);
 
   useEffect(() => {
