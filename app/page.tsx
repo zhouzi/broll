@@ -19,7 +19,7 @@ import queryString from "qs";
 import * as queryTypes from "query-types";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { type z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -65,34 +65,6 @@ const roboto = Roboto({
   weight: ["400", "500"],
 });
 
-const formSchema = z.object({
-  videoUrl: z
-    .string()
-    .url()
-    .default("https://www.youtube.com/watch?v=XEO3duW1A80")
-    .refine((value) => schema.getVideoId(value) != null, {
-      message: "Le format de l'URL est invalide",
-    }),
-  theme: schema.theme,
-});
-
-const lightTheme = schema.theme.parse({
-  card: schema.card.parse({}),
-  duration: schema.duration.parse({}),
-  progressBar: schema.progressBar.parse({}),
-  options: schema.options.parse({}),
-});
-
-const darkTheme = schema.theme.parse({
-  card: schema.card.parse({
-    foreground: "#f1f1f1",
-    background: "#0f0f0f",
-  }),
-  duration: schema.duration.parse({}),
-  progressBar: schema.progressBar.parse({}),
-  options: schema.options.parse({}),
-});
-
 interface DefaultColorTheme {
   name: string;
   theme: schema.Theme;
@@ -101,11 +73,11 @@ interface DefaultColorTheme {
 const defaultColorThemes = {
   light: {
     name: "Clair",
-    theme: lightTheme,
+    theme: schema.lightTheme,
   },
   dark: {
     name: "Sombre",
-    theme: darkTheme,
+    theme: schema.darkTheme,
   },
 } satisfies Record<string, DefaultColorTheme>;
 
@@ -147,16 +119,16 @@ function findColorThemeIdByTheme(theme: schema.Theme) {
   return undefined;
 }
 
-const defaultValues = formSchema.parse({
-  theme: lightTheme,
+const defaultValues = schema.formSchema.parse({
+  theme: schema.lightTheme,
 });
 
 export default function Home() {
   // const session = useSession();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof schema.formSchema>>({
     mode: "onBlur",
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema.formSchema),
     defaultValues,
   });
 
@@ -215,7 +187,7 @@ export default function Home() {
       }),
     ]
       .reverse()
-      .reduce<z.infer<typeof formSchema>>((acc, parse) => {
+      .reduce<z.infer<typeof schema.formSchema>>((acc, parse) => {
         let parsed: unknown = {};
 
         try {
@@ -226,7 +198,9 @@ export default function Home() {
           return acc;
         }
 
-        const parsedFormValues = formSchema.safeParse(deepMerge(acc, parsed));
+        const parsedFormValues = schema.formSchema.safeParse(
+          deepMerge(acc, parsed),
+        );
 
         if (parsedFormValues.success) {
           return parsedFormValues.data;
@@ -258,7 +232,7 @@ export default function Home() {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const subscription = form.watch((values) => {
-      const parsedFormValues = formSchema.safeParse(values);
+      const parsedFormValues = schema.formSchema.safeParse(values);
 
       if (!parsedFormValues.success) {
         return;

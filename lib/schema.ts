@@ -127,3 +127,31 @@ export function getVideoId(href: string) {
 
   return null;
 }
+
+export const formSchema = z.object({
+  videoUrl: z
+    .string()
+    .url()
+    .default("https://www.youtube.com/watch?v=XEO3duW1A80")
+    .refine((value) => getVideoId(value) != null, {
+      message: "Le format de l'URL est invalide",
+    }),
+  theme,
+});
+
+export const lightTheme = theme.parse({
+  card: card.parse({}),
+  duration: duration.parse({}),
+  progressBar: progressBar.parse({}),
+  options: options.parse({}),
+});
+
+export const darkTheme = theme.parse({
+  card: card.parse({
+    foreground: "#f1f1f1",
+    background: "#0f0f0f",
+  }),
+  duration: duration.parse({}),
+  progressBar: progressBar.parse({}),
+  options: options.parse({}),
+});
