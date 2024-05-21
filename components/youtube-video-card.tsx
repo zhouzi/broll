@@ -77,7 +77,7 @@ export function YouTubeVideoCard({
               right: `${scale(8)}px`,
               color: theme.duration.foreground,
               backgroundColor: theme.duration.background,
-              borderRadius: `${scale.borderRadius(2) - scale(8)}px`,
+              borderRadius: `${Math.max(0, scale.borderRadius(2) - scale(8))}px`,
               padding: `${scale.fontSize(0.2)}px`,
               ...scale.text(0.75),
             }}
