@@ -4,6 +4,8 @@ import path from "node:path";
 import deepMerge from "deepmerge";
 import { ImageResponse } from "next/og";
 import { type NextRequest } from "next/server";
+import queryString from "qs";
+import * as queryTypes from "query-types";
 
 import { fetchVideoDetails } from "@/app/api/youtube/video/[videoId]/route";
 import { YouTubeVideoCard, createScale } from "@/components/youtube-video-card";
@@ -13,7 +15,9 @@ export async function GET(request: NextRequest) {
   const formValues = schema.formSchema.parse(
     deepMerge(
       schema.formSchema.parse({ theme: schema.lightTheme }),
-      Object.fromEntries(request.nextUrl.searchParams),
+      queryTypes.parseObject(
+        queryString.parse(request.nextUrl.search.slice(1)),
+      ),
     ),
   );
 
