@@ -155,3 +155,7 @@ export const darkTheme = theme.parse({
   progressBar: progressBar.parse({}),
   options: options.parse({}),
 });
+
+export const defaultVideoDetails = videoDetails.parse({
+  channel: {},
+});

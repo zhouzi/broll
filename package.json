@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "vitest",
     "lint": "next lint",
     "lint:fix": "npm run lint -- --fix && prettier --write .",
     "db:studio": "drizzle-kit studio",
@@ -54,8 +55,10 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@testing-library/react": "^15.0.7",
     "@types/color": "^3.0.6",
     "@types/deep-equal": "^1.0.4",
+    "@types/jest-image-snapshot": "^6.4.0",
     "@types/node": "^20",
     "@types/pg": "^8.11.5",
     "@types/qs": "^6.9.15",
@@ -63,6 +66,7 @@
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
+    "@vitejs/plugin-react": "^4.2.1",
     "dotenv-cli": "^7.4.1",
     "drizzle-kit": "^0.20.17",
     "eslint": "^8",
@@ -70,12 +74,15 @@
     "eslint-plugin-drizzle": "^0.2.3",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-unused-imports": "^3.1.0",
+    "jest-image-snapshot": "^6.4.0",
+    "jsdom": "^24.0.0",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.7.2",
     "typescript": "^5",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "vitest": "^1.6.0"
   }
 }
