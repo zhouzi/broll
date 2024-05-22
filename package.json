@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "color": "^4.2.3",
+    "cookie": "^0.6.0",
     "dayjs": "^1.11.10",
     "deep-equal": "^2.2.3",
     "deepmerge": "^4.3.1",
