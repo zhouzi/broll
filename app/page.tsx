@@ -22,13 +22,7 @@ import { useForm } from "react-hook-form";
 import { type z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 // import {
 //   DropdownMenu,
@@ -311,11 +305,7 @@ export default function Home() {
       <main className="flex flex-col-reverse gap-8 md:flex-row">
         <div className="flex-1">
           <Card>
-            <CardHeader>
-              <CardTitle>Paramètres</CardTitle>
-              <CardDescription>Personnalisation de la vignette</CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <Form {...form}>
                 <form className="space-y-4">
                   <FormField
