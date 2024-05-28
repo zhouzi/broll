@@ -54,7 +54,10 @@ import * as schema from "@/lib/schema";
 import { type RenderStatus, useRenderPNG } from "@/lib/use-render-png";
 import { useVideoDetails } from "@/lib/use-video-details";
 
-import { DismissableBrowserExtensionBanner } from "./dismissable-browser-extension-banner";
+import {
+  DismissableBrowserExtensionBanner,
+  type DismissableBrowserExtensionBannerProps,
+} from "./dismissable-browser-extension-banner";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -119,11 +122,13 @@ const defaultValues = schema.formSchema.parse({
   theme: schema.lightTheme,
 });
 
-interface PageClientProps {
+export interface PageClientProps {
+  browser: DismissableBrowserExtensionBannerProps["browser"];
   initialBrowserExtensionBannerDismissed: boolean;
 }
 
 export default function PageClient({
+  browser,
   initialBrowserExtensionBannerDismissed,
 }: PageClientProps) {
   // const session = useSession();
@@ -263,6 +268,7 @@ export default function PageClient({
   return (
     <>
       <DismissableBrowserExtensionBanner
+        browser={browser}
         initialBrowserExtensionBannerDismissed={
           initialBrowserExtensionBannerDismissed
         }

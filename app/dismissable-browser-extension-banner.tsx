@@ -6,13 +6,16 @@ import { useEffect, useState } from "react";
 import {
   BROWSER_EXTENSION_BANNER_DISMISSED_COOKIE_NAME,
   BrowserExtensionBanner,
+  type BrowserExtensionBannerProps,
 } from "@/components/browser-extension-banner";
 
-interface DismissableBrowserExtensionBannerProps {
+export interface DismissableBrowserExtensionBannerProps {
+  browser: BrowserExtensionBannerProps["browser"];
   initialBrowserExtensionBannerDismissed: boolean;
 }
 
 export function DismissableBrowserExtensionBanner({
+  browser,
   initialBrowserExtensionBannerDismissed,
 }: DismissableBrowserExtensionBannerProps) {
   const [browserExtensionBannerDismissed, setBrowserExtensionBannerDismissed] =
@@ -33,6 +36,7 @@ export function DismissableBrowserExtensionBanner({
 
   return (
     <BrowserExtensionBanner
+      browser={browser}
       onDismiss={() => setBrowserExtensionBannerDismissed(true)}
     />
   );
