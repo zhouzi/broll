@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import deepEqual from "deep-equal";
 import deepMerge from "deepmerge";
 import {
+  ClipboardPaste,
   Copy,
   Download,
   Github,
@@ -333,7 +334,21 @@ export default function PageClient({
                       name="videoUrl"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>URL de la vidéo</FormLabel>
+                          <FormLabel className="flex items-center justify-between gap-2">
+                            URL de la vidéo{" "}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={async () =>
+                                field.onChange(
+                                  await navigator.clipboard.readText(),
+                                )
+                              }
+                            >
+                              <ClipboardPaste className="mr-2 size-4" /> Coller
+                            </Button>
+                          </FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
