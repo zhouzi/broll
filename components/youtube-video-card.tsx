@@ -115,6 +115,8 @@ export function YouTubeVideoCard({
               borderRadius: "100%",
               width: `${scale.fontSize(2.6)}px`,
               height: `${scale.fontSize(2.6)}px`,
+              // Nécessaire pour l'export. Satori ne gère pas width: 0
+              display: scale.fontSize(2.6) ? 'none' : 'block',
             }}
           />
         )}
