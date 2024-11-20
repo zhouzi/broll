@@ -1,4 +1,5 @@
 import { youtube, type youtube_v3 } from "@googleapis/youtube";
+import dayjs from "dayjs";
 
 import { env } from "@/lib/env";
 
@@ -9,7 +10,7 @@ const client = youtube({
   version: "v3",
 });
 
-const aWeekInSeconds = 604800;
+const CACHE_EXPIRY_IN_SECONDS = dayjs.duration({ hours: 1 }).asSeconds();
 
 const videoParts = ["snippet", "statistics", "contentDetails"];
 
@@ -56,7 +57,7 @@ export async function getVideoById({
   }
 
   if (video) {
-    await setJson(videoKey, video, { ex: aWeekInSeconds });
+    await setJson(videoKey, video, { ex: CACHE_EXPIRY_IN_SECONDS });
     return video;
   }
 
@@ -109,7 +110,7 @@ export async function getChannelById({
   }
 
   if (channel) {
-    await setJson(channelKey, channel, { ex: aWeekInSeconds });
+    await setJson(channelKey, channel, { ex: CACHE_EXPIRY_IN_SECONDS });
     return channel;
   }
 
